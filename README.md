@@ -1,17 +1,19 @@
-# aturaja
+ProjectAturAja
+Kelompok 2 Pemrograman Mobile
+Anggota : 
+1. Dishwar Raya Pradipta 24082010008
+2. Azarya Yanuar Krisyanto 24082010012
+3. Icha Leona Ardianti 24082010015
+4. Fachrisya Maula Ardhi 24082010023
+5. Athalia Jevon Priyadi 24082010026
 
-A new Flutter project.
+Deskripsi Aplikasi :
+AturAja merupakan aplikasi dompet digital yang berfokus pada fitur budgeting digital yang terintegrasi dengan E-Wallet lainnya untuk membantu pengguna dalam mengelola keuangannya secara bijak. Dengan aplikasi ini, pengguna tidak hanya menggunakan dompet digital untuk bertransaksi, tetapi juga menjadikannya sistem pembelajaran, merencanakan dan mengatur keuangan pribadi secara berkelanjutan.
 
-## Getting Started
+Model Bisnis Monetisasi:
+AturAja menggunakan Model Bisnis Monetisasi berupa biaya transaksi dan layanan, dengan adanya integrasi dengan E-Wallet, AturAja mengambil margin kecil dari transaksi yang dilakukan didalam aplikasi
 
-This project is a starting point for a Flutter application.
+Screenshot Layar Utama Aplikasi : 
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
