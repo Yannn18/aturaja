@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Pindah ke halaman Home setelah 3 detik
     Timer(const Duration(seconds: 3), () {
       // Navigasi ke rute home yang sudah didaftarkan di main.dart
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/login');
     });
   }
 

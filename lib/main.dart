@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 import 'ui/screens/home/home_screen.dart';
 import 'ui/screens/splash/splash_screen.dart';
+import 'ui/screens/login/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
+        '/login' : (context) => const LoginScreen(),
         '/home': (context) => const App(),
         '/history': (context) => const HistoryScreen(),
       },
