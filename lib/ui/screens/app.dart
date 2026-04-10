@@ -14,9 +14,15 @@ class _AppState extends State<App> {
   int _selectedIndex = 0;
 
   // Daftar halaman utama aplikasi
-  final List<Widget> _pages = [
+  List<Widget> get _pages => [
     const HomeScreen(),
-    const HistoryScreen(),
+    HistoryScreen(
+      onBack: () {
+        setState(() {
+          _selectedIndex = 0;
+        });
+      },
+    ),
     const Center(child: Text("Message Page", style: TextStyle(fontSize: 24))),
     const Center(child: Text("Profile Page", style: TextStyle(fontSize: 24))),
   ];
