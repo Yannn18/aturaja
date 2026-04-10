@@ -25,7 +25,7 @@ class HomeScreen extends StatelessWidget {
             // 4. Quick Actions
             _buildQuickActions(),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 0),
 
             // 5. Services Grid
             _buildServicesGrid(),
@@ -191,6 +191,7 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.money,
             label: 'Pinjaman',
             color: Colors.orange,
+            isPromo: true,
           ),
           ServiceItem(
             icon: Icons.nightlight_round,
