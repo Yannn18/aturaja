@@ -153,43 +153,52 @@ class _HistoryScreenState extends State<HistoryScreen> {
         .toSet()
         .toList();
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
             //header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: widget.onBack ?? () => Navigator.pop(context),
-                    icon: Icon(
-                      Icons.chevron_left,
-                      size: 32,
-                      color: Colors.grey[900],
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: widget.onBack ?? () => Navigator.pop(context),
+                      icon: Icon(
+                        Icons.chevron_left,
+                        size: 32,
+                        color: Colors.grey[900],
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      splashRadius: 24,
                     ),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                    splashRadius: 24,
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    'Riwayat Transaksi',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[900],
+                    const SizedBox(width: 16),
+                    Text(
+                      'History',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[900],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
+            // Draggable Sheet (Bisa ditarik atas bawah)
+            DraggableScrollableSheet(
+              initialChildSize: 0.85,
+              minChildSize: 0.5,
+              maxChildSize: 1.0,
+              snap: true,
+              builder: (BuildContext context, ScrollController scrollController) {
+                return Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -198,14 +207,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withOpacity(0.08),
                         offset: const Offset(0, -4),
                         blurRadius: 20,
                       ),
                     ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // 1. UBAH COLUMN MENJADI LISTVIEW
+                  child: ListView(
+                    controller: scrollController, // 2. PASANG CONTROLLER DI SINI
+                    padding: EdgeInsets.zero, // Hilangkan padding bawaan ListView
                     children: [
                       const SizedBox(height: 24),
                       // Drag Handle
@@ -214,7 +225,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           width: 48,
                           height: 6,
                           decoration: BoxDecoration(
-                            color: Colors.grey[200],
+                            color: Colors.grey[300],
                             borderRadius: BorderRadius.circular(9999),
                           ),
                         ),
@@ -281,44 +292,45 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       const SizedBox(height: 16),
 
                       // Transactions List
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(color: Colors.grey[100]!),
-                            ),
-                          ),
-                          child: SingleChildScrollView(
-                            child: uniqueDates.isEmpty
-                                // Tampilan jika bulan tidak ada transaksi (opsional, sebagai pengaman)
-                                ? const Padding(
-                                    padding: EdgeInsets.all(32.0),
-                                    child: Center(
-                                      child: Text(
-                                        "Tidak ada transaksi",
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
-                                    ),
-                                  )
-                                // Tampilan dinamis per grup tanggal
-                                : Column(
-                                    children: uniqueDates.map((date) {
-                                      return TransactionGroup(
-                                        date: date,
-                                        // Kirim item yang hanya sesuai dengan tanggal ini
-                                        items: currentMonthTransactions
-                                            .where((t) => t.date == date)
-                                            .toList(),
-                                      );
-                                    }).toList(),
-                                  ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(color: Colors.grey[100]!),
                           ),
                         ),
+                        child: uniqueDates.isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.only(top: 60),
+                                child: Center(
+                                  child: Text(
+                                    "Tidak ada transaksi",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ),
+                              )
+                            : ListView.builder(
+                                // 3. HAPUS CONTROLLER DARI SINI
+                                padding: const EdgeInsets.only(top: 8, bottom: 24),
+                                shrinkWrap: true, // 4. WAJIB ADA (karena di dalam ListView lain)
+                                physics: const NeverScrollableScrollPhysics(), // 5. WAJIB ADA agar tidak bentrok
+                                itemCount: uniqueDates.length,
+                                itemBuilder: (context, index) {
+                                  final date = uniqueDates[index];
+                                  final items = currentMonthTransactions
+                                      .where((t) => t.date == date)
+                                      .toList();
+
+                                  return TransactionGroup(
+                                    date: date,
+                                    items: items,
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
@@ -360,13 +372,14 @@ class TransactionGroup extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
+          ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: items.map((item) {
-                return AnimatedTransactionButton(item: item);
-              }).toList(),
-            ),
+            shrinkWrap: true, 
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            itemBuilder: (context, index) {
+              return AnimatedTransactionButton(item: items[index]);
+            },
           ),
         ],
       ),
@@ -441,46 +454,51 @@ class _AnimatedTransactionButtonState extends State<AnimatedTransactionButton>
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        widget.item.icon,
-                        color: AppColors.brandRed,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.item.category,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[900],
-                            fontSize: 14,
-                          ),
-                        ),
-                        Text(
-                          widget.item.time,
-                          style: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                // 1. Ikon
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    widget.item.icon,
+                    color: AppColors.brandRed,
+                    size: 24,
+                  ),
                 ),
+                const SizedBox(width: 16),
+                
+                // 2. Teks Kategori & Waktu dibungkus Expanded
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.item.category,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[900],
+                          fontSize: 14,
+                        ),
+                        maxLines: 1, // Membatasi teks hanya 1 baris
+                        overflow: TextOverflow.ellipsis, // Menambahkan "..." jika teks terlalu panjang
+                      ),
+                      const SizedBox(height: 2), // Sedikit jarak antar teks
+                      Text(
+                        widget.item.time,
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(width: 8),
                 Text(
                   widget.item.amount,
                   style: TextStyle(

@@ -5,9 +5,17 @@ import 'history_screen.dart'; // Import model Transaction dari file history
 class TransactionDetailScreen extends StatelessWidget {
   final Transaction transaction;
 
-  const TransactionDetailScreen({Key? key, required this.transaction})
-    : super(key: key);
+  const TransactionDetailScreen({
+    Key? key, required this.transaction,
+  }) : super(key: key);
 
+  String _getMonthYearTag(String date) {
+    final parts = date.split(' ');
+    if (parts.length >= 3) {
+      return "#${parts[1]}${parts[2]}"; 
+    }
+    return "#${date.replaceAll(' ', '')}"; // Fallback jika format berbeda
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,16 +25,12 @@ class TransactionDetailScreen extends StatelessWidget {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 24),
               child: Row(
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(
-                      Icons.chevron_left,
-                      size: 24,
-                      color: Colors.grey[600],
-                    ),
+                    icon: Icon(Icons.chevron_left, size: 32, color: Colors.grey[900]),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     splashRadius: 24,
@@ -83,12 +87,7 @@ class TransactionDetailScreen extends StatelessWidget {
                                   color: AppColors.brandRed,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(
-                                  Icons.check,
-                                  color: Colors.white,
-                                  size: 24,
-                                  weight: 700,
-                                ),
+                                child: const Icon(Icons.check, color: Colors.white, size: 24, weight: 700),
                               ),
                             ),
                           ),
@@ -102,13 +101,16 @@ class TransactionDetailScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            transaction.amount,
-                            style: TextStyle(
-                              fontSize: 32, // text-4xl
-                              fontWeight: FontWeight.w800, // font-extrabold
-                              color: Colors.grey[900],
-                              letterSpacing: -0.5, // tracking-tight
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              transaction.amount,
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.grey[900],
+                                letterSpacing: -0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -134,8 +136,7 @@ class TransactionDetailScreen extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              transaction
-                                  .icon, // Menggunakan icon dari transaksi agar sesuai jenisnya
+                              transaction.icon, // Menggunakan icon dari transaksi agar sesuai jenisnya
                               color: Colors.blue[600],
                               size: 28,
                             ),
@@ -193,38 +194,36 @@ class TransactionDetailScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "TRANSACTION ID",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[400],
-                                      letterSpacing: 2.0,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "TRANSACTION ID",
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[400],
+                                        letterSpacing: 2.0,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "TXN12345678${transaction.id}", // ID unik
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[900],
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "TXN12345678${transaction.id}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[900],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               InkWell(
                                 onTap: () {},
                                 child: const Row(
                                   children: [
-                                    Icon(
-                                      Icons.copy,
-                                      size: 14,
-                                      color: AppColors.brandRed,
-                                    ),
+                                    Icon(Icons.copy, size: 14, color: AppColors.brandRed),
                                     SizedBox(width: 4),
                                     Text(
                                       "Copy",
@@ -302,16 +301,17 @@ class TransactionDetailScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // 4. Tags
-                    Row(
-                      children: [
-                        _buildTag(
-                          "#${transaction.category.replaceAll(' ', '')}",
-                        ),
-                        const SizedBox(width: 8),
-                        _buildTag("#DailyNeeds"),
-                        const SizedBox(width: 8),
-                        _buildTag("#April2025"),
-                      ],
+                    SizedBox(
+                      width: double.infinity,
+                      child: Wrap(
+                        spacing: 8.0, // Jarak horizontal antar tag
+                        runSpacing: 8.0, // Jarak vertikal jika tag turun ke baris baru
+                        children: [
+                          _buildTag("#${transaction.category.replaceAll(' ', '')}"),
+                          _buildTag("#DailyNeeds"),
+                          _buildTag(_getMonthYearTag(transaction.date)), // Tag bulan dinamis
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 24),
                   ],
@@ -347,12 +347,17 @@ class TransactionDetailScreen extends StatelessWidget {
                           children: [
                             Icon(Icons.share, color: Colors.white, size: 20),
                             SizedBox(width: 8),
-                            Text(
-                              "Bagikan Resi",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  "Bagikan Resi",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -380,11 +385,7 @@ class TransactionDetailScreen extends StatelessWidget {
                         ],
                       ),
                       child: Center(
-                        child: Icon(
-                          Icons.file_download_outlined,
-                          size: 24,
-                          color: Colors.grey[900],
-                        ),
+                        child: Icon(Icons.file_download_outlined, size: 24, color: Colors.grey[900]),
                       ),
                     ),
                   ),
@@ -421,32 +422,21 @@ class AnimatedScaleButton extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;
 
-  const AnimatedScaleButton({
-    Key? key,
-    required this.child,
-    required this.onTap,
-  }) : super(key: key);
+  const AnimatedScaleButton({Key? key, required this.child, required this.onTap}) : super(key: key);
 
   @override
   State<AnimatedScaleButton> createState() => _AnimatedScaleButtonState();
 }
 
-class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
-    with SingleTickerProviderStateMixin {
+class _AnimatedScaleButtonState extends State<AnimatedScaleButton> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -466,8 +456,10 @@ class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
       onTapCancel: () => _controller.reverse(),
       child: AnimatedBuilder(
         animation: _scaleAnimation,
-        builder: (context, child) =>
-            Transform.scale(scale: _scaleAnimation.value, child: child),
+        builder: (context, child) => Transform.scale(
+          scale: _scaleAnimation.value,
+          child: child,
+        ),
         child: widget.child,
       ),
     );
