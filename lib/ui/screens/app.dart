@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/colors.dart'; // Import konstanta warna
 import 'home/home_screen.dart';
+import 'history/history_screen.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -15,7 +16,7 @@ class _AppState extends State<App> {
   // Daftar halaman utama aplikasi
   final List<Widget> _pages = [
     const HomeScreen(),
-    const Center(child: Text("History Page", style: TextStyle(fontSize: 24))),
+    const HistoryScreen(),
     const Center(child: Text("Message Page", style: TextStyle(fontSize: 24))),
     const Center(child: Text("Profile Page", style: TextStyle(fontSize: 24))),
   ];
