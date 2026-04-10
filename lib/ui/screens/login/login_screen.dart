@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/constants/colors.dart';
-
-// Import HomeScreen
 import '../home/home_screen.dart' as home;
 
 class LoginScreen extends StatefulWidget {
@@ -14,11 +12,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
+
+  // 1. TAMBAHKAN GLOBAL KEY (Wajib kriteria ETS)
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _phoneController    = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  String? _phoneError;
-  String? _passwordError;
 
   late AnimationController _floatController;
   late Animation<double> _floatAnimation;
@@ -44,49 +43,26 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
-  // ── Validation (Logika 6 Angka Dimasukkan Kembali!) ───────────────────────
-
-  bool _validate() {
-    String? phoneErr;
-    String? passErr;
-
-    final phone    = _phoneController.text.trim();
-    final password = _passwordController.text;
-
-    if (phone.isEmpty) {
-      phoneErr = 'Nomor telepon tidak boleh kosong';
-    } else if (phone.length < 6) {
-      phoneErr = 'Nomor telepon minimal 6 angka';
-    } else if (!RegExp(r'^\d+$').hasMatch(phone)) {
-      phoneErr = 'Nomor telepon harus berupa angka';
-    }
-
-    if (password.isEmpty) {
-      passErr = 'Password tidak boleh kosong';
-    } else {
-      final hasUpper  = password.contains(RegExp(r'[A-Z]'));
-      final hasLower  = password.contains(RegExp(r'[a-z]'));
-      final hasNumber = password.contains(RegExp(r'[0-9]'));
-      if (!hasUpper || !hasLower || !hasNumber) {
-        passErr = 'Password harus mengandung huruf besar, kecil, dan angka';
-      }
-    }
-
-    setState(() {
-      _phoneError    = phoneErr;
-      _passwordError = passErr;
-    });
-
-    return phoneErr == null && passErr == null;
-  }
-
+  // 2. LOGIKA LOGIN DENGAN VALIDASI FORM & SNACKBAR
   void _handleLogin() {
-    if (_validate()) {
-      Navigator.pushReplacementNamed(context, '/home');
+    // Mengecek apakah form valid menggunakan GlobalKey
+    if (_formKey.currentState!.validate()) {
+
+      // Menampilkan SnackBar (Wajib kriteria ETS)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login Berhasil! Selamat Datang.'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      // Delay sebentar biar SnackBar kelihatan, lalu pindah halaman
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pushReplacementNamed(context, '/home');
+      });
     }
   }
-
-  // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -95,188 +71,173 @@ class _LoginScreenState extends State<LoginScreen>
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-          child: Column(
-            children: [
-              // Floating illustration (Diganti Icon sementara karena file temenmu nggak ada)
-              SizedBox(
-                height: 220,
-                child: Center(
-                  child: AnimatedBuilder(
-                    animation: _floatAnimation,
-                    builder: (context, child) => Transform.translate(
-                      offset: Offset(0, _floatAnimation.value),
-                      child: child,
-                    ),
-                    child: const Icon(Icons.phone_android_rounded, size: 100, color: AppColors.brandRed),
+
+          // 3. BUNGKUS DENGAN WIDGET FORM
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _buildHeaderAnimation(),
+                const SizedBox(height: 32),
+                const Text(
+                  'Login',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textDark,
                   ),
                 ),
-              ),
+                const SizedBox(height: 32),
 
-              const SizedBox(height: 32),
-
-              const Text(
-                'Login',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textDark,
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Phone number (Menggunakan Helper Widget buatan sendiri)
-              _buildLabeledField(
-                label: 'PHONE NUMBER',
-                error: _phoneError,
-                child: TextField(
+                // 4. GANTI MENJADI TEXTFORMFIELD + VALIDATOR
+                _buildFieldLabel('PHONE NUMBER'),
+                TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: _inputDecoration(
-                    hint: 'Masukkan minimal 6 angka',
-                    hasError: _phoneError != null,
-                  ),
+                  decoration: _inputDecoration(hint: 'Masukkan minimal 6 angka'),
+                  // ATURAN VALIDASI 1
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nomor telepon tidak boleh kosong';
+                    }
+                    if (value.length < 6) {
+                      return 'Nomor telepon minimal 6 karakter';
+                    }
+                    return null;
+                  },
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // Password
-              _buildLabeledField(
-                label: 'PASSWORD',
-                error: _passwordError,
-                child: TextField(
+                _buildFieldLabel('PASSWORD'),
+                TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: _inputDecoration(
-                    hint: 'Huruf besar, kecil & angka',
-                    hasError: _passwordError != null,
-                  ),
+                  decoration: _inputDecoration(hint: 'Huruf besar, kecil & angka'),
+                  // ATURAN VALIDASI 2
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Password tidak boleh kosong';
+                    }
+                    // Validasi regex huruf besar, kecil, angka
+                    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
+                      return 'Harus mengandung huruf besar, kecil, dan angka';
+                    }
+                    return null;
+                  },
                 ),
-              ),
 
-              const SizedBox(height: 28),
+                const SizedBox(height: 28),
 
-              // Login button (Diganti GestureDetector + AnimatedContainer biar nggak error)
-              GestureDetector(
-                onTap: _handleLogin,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  decoration: BoxDecoration(
-                    color: AppColors.brandRed,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.red.shade100,
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 32),
-
-              // Sign up
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Not Registered yet? ',
-                    style: TextStyle(
-                      color: Colors.grey.shade400,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        color: AppColors.brandRed,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                _buildLoginButton(),
+                const SizedBox(height: 32),
+                _buildSignUpText(),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // ── Helpers (Penyelamat Error) ────────────────────────────────────────────
+  // --- UI HELPER WIDGETS ---
 
-  // Fungsi pengganti LabeledField punya temenmu yang hilang
-  Widget _buildLabeledField({required String label, String? error, required Widget child}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.0,
-            color: Colors.grey.shade600,
+  Widget _buildHeaderAnimation() {
+    return SizedBox(
+      height: 220,
+      child: Center(
+        child: AnimatedBuilder(
+          animation: _floatAnimation,
+          builder: (context, child) => Transform.translate(
+            offset: Offset(0, _floatAnimation.value),
+            child: child,
           ),
+          child: const Icon(Icons.phone_android_rounded, size: 100, color: AppColors.brandRed),
         ),
-        const SizedBox(height: 8),
-        child,
-        if (error != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(
-              error,
-              style: const TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.w500),
+      ),
+    );
+  }
+
+  Widget _buildFieldLabel(String label) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.0,
+          color: Colors.grey.shade600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return GestureDetector(
+      onTap: _handleLogin,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        decoration: BoxDecoration(
+          color: AppColors.brandRed,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.red.shade100,
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Text(
+            'Login',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
+              letterSpacing: 0.5,
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignUpText() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Not Registered yet? ',
+          style: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.w700, fontSize: 12),
+        ),
+        const Text(
+          'Sign Up',
+          style: TextStyle(color: AppColors.brandRed, fontWeight: FontWeight.w700, fontSize: 12),
+        ),
       ],
     );
   }
 
-  InputDecoration _inputDecoration({
-    required String hint,
-    required bool hasError,
-  }) {
+  InputDecoration _inputDecoration({required String hint}) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(
-        color: Colors.grey.shade400,
-        fontWeight: FontWeight.w500,
-        fontSize: 14,
-      ),
+      hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
       filled: true,
-      fillColor: hasError ? AppColors.errorFill : Colors.white,
+      fillColor: Colors.grey.shade50,
       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-      border: OutlineInputBorder(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+      errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: Colors.grey.shade200),
+        borderSide: const BorderSide(color: Colors.red, width: 1),
       ),
-      enabledBorder: OutlineInputBorder(
+      focusedErrorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(
-          color: hasError ? Colors.red : Colors.grey.shade200,
-        ),
+        borderSide: const BorderSide(color: Colors.red, width: 1.5),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
