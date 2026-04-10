@@ -1,3 +1,4 @@
+import 'package:aturaja/ui/screens/app.dart';
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 import 'ui/screens/home/home_screen.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
-        '/home': (context) => const HomeScreen(),
+        '/home': (context) => const App(),
       },
     );
   }
