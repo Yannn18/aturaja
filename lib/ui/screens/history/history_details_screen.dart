@@ -5,10 +5,8 @@ import 'history_screen.dart'; // Import model Transaction dari file history
 class TransactionDetailScreen extends StatelessWidget {
   final Transaction transaction;
 
-  const TransactionDetailScreen({
-    Key? key,
-    required this.transaction,
-  }) : super(key: key);
+  const TransactionDetailScreen({Key? key, required this.transaction})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +22,11 @@ class TransactionDetailScreen extends StatelessWidget {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.arrow_back, size: 24, color: Colors.grey[600]),
+                    icon: Icon(
+                      Icons.chevron_left,
+                      size: 24,
+                      color: Colors.grey[600],
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     splashRadius: 24,
@@ -81,7 +83,12 @@ class TransactionDetailScreen extends StatelessWidget {
                                   color: AppColors.brandRed,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.check, color: Colors.white, size: 24, weight: 700),
+                                child: const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 24,
+                                  weight: 700,
+                                ),
                               ),
                             ),
                           ),
@@ -127,7 +134,8 @@ class TransactionDetailScreen extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              transaction.icon, // Menggunakan icon dari transaksi agar sesuai jenisnya
+                              transaction
+                                  .icon, // Menggunakan icon dari transaksi agar sesuai jenisnya
                               color: Colors.blue[600],
                               size: 28,
                             ),
@@ -212,7 +220,11 @@ class TransactionDetailScreen extends StatelessWidget {
                                 onTap: () {},
                                 child: const Row(
                                   children: [
-                                    Icon(Icons.copy, size: 14, color: AppColors.brandRed),
+                                    Icon(
+                                      Icons.copy,
+                                      size: 14,
+                                      color: AppColors.brandRed,
+                                    ),
                                     SizedBox(width: 4),
                                     Text(
                                       "Copy",
@@ -292,7 +304,9 @@ class TransactionDetailScreen extends StatelessWidget {
                     // 4. Tags
                     Row(
                       children: [
-                        _buildTag("#${transaction.category.replaceAll(' ', '')}"),
+                        _buildTag(
+                          "#${transaction.category.replaceAll(' ', '')}",
+                        ),
                         const SizedBox(width: 8),
                         _buildTag("#DailyNeeds"),
                         const SizedBox(width: 8),
@@ -366,7 +380,11 @@ class TransactionDetailScreen extends StatelessWidget {
                         ],
                       ),
                       child: Center(
-                        child: Icon(Icons.file_download_outlined, size: 24, color: Colors.grey[900]),
+                        child: Icon(
+                          Icons.file_download_outlined,
+                          size: 24,
+                          color: Colors.grey[900],
+                        ),
                       ),
                     ),
                   ),
@@ -403,21 +421,32 @@ class AnimatedScaleButton extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;
 
-  const AnimatedScaleButton({Key? key, required this.child, required this.onTap}) : super(key: key);
+  const AnimatedScaleButton({
+    Key? key,
+    required this.child,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   State<AnimatedScaleButton> createState() => _AnimatedScaleButtonState();
 }
 
-class _AnimatedScaleButtonState extends State<AnimatedScaleButton> with SingleTickerProviderStateMixin {
+class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -437,10 +466,8 @@ class _AnimatedScaleButtonState extends State<AnimatedScaleButton> with SingleTi
       onTapCancel: () => _controller.reverse(),
       child: AnimatedBuilder(
         animation: _scaleAnimation,
-        builder: (context, child) => Transform.scale(
-          scale: _scaleAnimation.value,
-          child: child,
-        ),
+        builder: (context, child) =>
+            Transform.scale(scale: _scaleAnimation.value, child: child),
         child: widget.child,
       ),
     );
