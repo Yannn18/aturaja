@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/colors.dart';
 import 'history_screen.dart'; // Import model Transaction dari file history
 
 class TransactionDetailScreen extends StatelessWidget {
   final Transaction transaction;
 
-  const TransactionDetailScreen({
-    Key? key, required this.transaction,
-  }) : super(key: key);
+  const TransactionDetailScreen({Key? key, required this.transaction})
+    : super(key: key);
 
   String _getMonthYearTag(String date) {
     final parts = date.split(' ');
     if (parts.length >= 3) {
-      return "#${parts[1]}${parts[2]}"; 
+      return "#${parts[1]}${parts[2]}";
     }
     return "#${date.replaceAll(' ', '')}"; // Fallback jika format berbeda
   }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFD), // bg-[#FDFDFD]
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -30,7 +33,11 @@ class TransactionDetailScreen extends StatelessWidget {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.chevron_left, size: 32, color: Colors.grey[900]),
+                    icon: Icon(
+                      Icons.chevron_left,
+                      size: 32,
+                      color: colorScheme.onBackground,
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                     splashRadius: 24,
@@ -38,10 +45,9 @@ class TransactionDetailScreen extends StatelessWidget {
                   const SizedBox(width: 16),
                   Text(
                     'Transaction Details',
-                    style: TextStyle(
-                      fontSize: 20,
+                    style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[900],
+                      color: colorScheme.onBackground,
                     ),
                   ),
                 ],
@@ -59,9 +65,9 @@ class TransactionDetailScreen extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24), // rounded-3xl
-                        border: Border.all(color: Colors.grey[50]!),
+                        color: colorScheme.surface,
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(color: colorScheme.outline),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.04),
@@ -76,27 +82,31 @@ class TransactionDetailScreen extends StatelessWidget {
                             width: 64,
                             height: 64,
                             decoration: BoxDecoration(
-                              color: Colors.red[50],
+                              color: colorScheme.primaryContainer,
                               shape: BoxShape.circle,
                             ),
                             child: Center(
                               child: Container(
                                 width: 48,
                                 height: 48,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.brandRed,
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.check, color: Colors.white, size: 24, weight: 700),
+                                child: Icon(
+                                  Icons.check,
+                                  color: colorScheme.onPrimary,
+                                  size: 24,
+                                  weight: 700,
+                                ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             "Transaksi Berhasil",
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 14,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -105,10 +115,9 @@ class TransactionDetailScreen extends StatelessWidget {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               transaction.amount,
-                              style: TextStyle(
-                                fontSize: 32,
+                              style: textTheme.headlineSmall?.copyWith(
                                 fontWeight: FontWeight.w800,
-                                color: Colors.grey[900],
+                                color: colorScheme.onSurface,
                                 letterSpacing: -0.5,
                               ),
                             ),
@@ -122,9 +131,9 @@ class TransactionDetailScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8F9FB), // bg-[#F8F9FB]
+                        color: colorScheme.surfaceVariant,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.grey[50]!),
+                        border: Border.all(color: colorScheme.outline),
                       ),
                       child: Row(
                         children: [
@@ -132,12 +141,12 @@ class TransactionDetailScreen extends StatelessWidget {
                             width: 56,
                             height: 56,
                             decoration: BoxDecoration(
-                              color: Colors.blue[100],
+                              color: colorScheme.secondaryContainer,
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              transaction.icon, // Menggunakan icon dari transaksi agar sesuai jenisnya
-                              color: Colors.blue[600],
+                              transaction.icon,
+                              color: colorScheme.secondary,
                               size: 28,
                             ),
                           ),
@@ -148,20 +157,18 @@ class TransactionDetailScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   "MERCHANT",
-                                  style: TextStyle(
-                                    fontSize: 10,
+                                  style: textTheme.labelSmall?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.grey[400],
-                                    letterSpacing: 2.0, // tracking-widest
+                                    color: colorScheme.onSurfaceVariant,
+                                    letterSpacing: 2.0,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   transaction.category,
-                                  style: TextStyle(
-                                    fontSize: 20, // text-xl
+                                  style: textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.grey[900],
+                                    color: colorScheme.onSurface,
                                   ),
                                 ),
                               ],
@@ -176,9 +183,9 @@ class TransactionDetailScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.grey[50]!),
+                        border: Border.all(color: colorScheme.outline),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.04),
@@ -200,20 +207,18 @@ class TransactionDetailScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       "TRANSACTION ID",
-                                      style: TextStyle(
-                                        fontSize: 10,
+                                      style: textTheme.labelSmall?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey[400],
+                                        color: colorScheme.onSurfaceVariant,
                                         letterSpacing: 2.0,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       "TXN12345678${transaction.id}",
-                                      style: TextStyle(
-                                        fontSize: 14,
+                                      style: textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey[900],
+                                        color: colorScheme.onSurface,
                                       ),
                                     ),
                                   ],
@@ -221,16 +226,19 @@ class TransactionDetailScreen extends StatelessWidget {
                               ),
                               InkWell(
                                 onTap: () {},
-                                child: const Row(
+                                child: Row(
                                   children: [
-                                    Icon(Icons.copy, size: 14, color: AppColors.brandRed),
-                                    SizedBox(width: 4),
+                                    Icon(
+                                      Icons.copy,
+                                      size: 14,
+                                      color: colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 4),
                                     Text(
                                       "Copy",
-                                      style: TextStyle(
-                                        fontSize: 12,
+                                      style: textTheme.labelLarge?.copyWith(
+                                        color: colorScheme.primary,
                                         fontWeight: FontWeight.bold,
-                                        color: AppColors.brandRed,
                                       ),
                                     ),
                                   ],
@@ -248,20 +256,18 @@ class TransactionDetailScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       "DATE & TIME",
-                                      style: TextStyle(
-                                        fontSize: 10,
+                                      style: textTheme.labelSmall?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey[400],
+                                        color: colorScheme.onSurfaceVariant,
                                         letterSpacing: 2.0,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       "${transaction.date},\n${transaction.time}",
-                                      style: TextStyle(
-                                        fontSize: 14,
+                                      style: textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey[900],
+                                        color: colorScheme.onSurface,
                                         height: 1.2,
                                       ),
                                     ),
@@ -274,20 +280,18 @@ class TransactionDetailScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       "PAYMENT METHOD",
-                                      style: TextStyle(
-                                        fontSize: 10,
+                                      style: textTheme.labelSmall?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey[400],
+                                        color: colorScheme.onSurfaceVariant,
                                         letterSpacing: 2.0,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       "Saldo Utama",
-                                      style: TextStyle(
-                                        fontSize: 14,
+                                      style: textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.grey[900],
+                                        color: colorScheme.onSurface,
                                       ),
                                     ),
                                   ],
@@ -304,12 +308,15 @@ class TransactionDetailScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: Wrap(
-                        spacing: 8.0, // Jarak horizontal antar tag
-                        runSpacing: 8.0, // Jarak vertikal jika tag turun ke baris baru
+                        spacing: 8.0,
+                        runSpacing: 8.0,
                         children: [
-                          _buildTag("#${transaction.category.replaceAll(' ', '')}"),
-                          _buildTag("#DailyNeeds"),
-                          _buildTag(_getMonthYearTag(transaction.date)), // Tag bulan dinamis
+                          _buildTag(
+                            "#${transaction.category.replaceAll(' ', '')}",
+                            theme,
+                          ),
+                          _buildTag("#DailyNeeds", theme),
+                          _buildTag(_getMonthYearTag(transaction.date), theme),
                         ],
                       ),
                     ),
@@ -332,28 +339,32 @@ class TransactionDetailScreen extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          color: AppColors.brandRed,
-                          borderRadius: BorderRadius.circular(999), // full
+                          color: colorScheme.primary,
+                          borderRadius: BorderRadius.circular(999),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.red[100]!,
+                              color: colorScheme.primary.withOpacity(0.15),
                               blurRadius: 15,
                               offset: const Offset(0, 8),
                             ),
                           ],
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.share, color: Colors.white, size: 20),
-                            SizedBox(width: 8),
+                            Icon(
+                              Icons.share,
+                              color: colorScheme.onPrimary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
                             Flexible(
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Text(
                                   "Bagikan Resi",
-                                  style: TextStyle(
-                                    color: Colors.white,
+                                  style: textTheme.labelLarge?.copyWith(
+                                    color: colorScheme.onPrimary,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
@@ -374,7 +385,7 @@ class TransactionDetailScreen extends StatelessWidget {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: Colors.grey[100],
+                        color: colorScheme.surfaceVariant,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
@@ -385,7 +396,11 @@ class TransactionDetailScreen extends StatelessWidget {
                         ],
                       ),
                       child: Center(
-                        child: Icon(Icons.file_download_outlined, size: 24, color: Colors.grey[900]),
+                        child: Icon(
+                          Icons.file_download_outlined,
+                          size: 24,
+                          color: colorScheme.onSurface,
+                        ),
                       ),
                     ),
                   ),
@@ -398,18 +413,19 @@ class TransactionDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTag(String label) {
+  Widget _buildTag(String label, ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         label,
-        style: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 10,
+        style: textTheme.labelSmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -422,21 +438,32 @@ class AnimatedScaleButton extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;
 
-  const AnimatedScaleButton({Key? key, required this.child, required this.onTap}) : super(key: key);
+  const AnimatedScaleButton({
+    Key? key,
+    required this.child,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   State<AnimatedScaleButton> createState() => _AnimatedScaleButtonState();
 }
 
-class _AnimatedScaleButtonState extends State<AnimatedScaleButton> with SingleTickerProviderStateMixin {
+class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 100));
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -456,10 +483,8 @@ class _AnimatedScaleButtonState extends State<AnimatedScaleButton> with SingleTi
       onTapCancel: () => _controller.reverse(),
       child: AnimatedBuilder(
         animation: _scaleAnimation,
-        builder: (context, child) => Transform.scale(
-          scale: _scaleAnimation.value,
-          child: child,
-        ),
+        builder: (context, child) =>
+            Transform.scale(scale: _scaleAnimation.value, child: child),
         child: widget.child,
       ),
     );

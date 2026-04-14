@@ -14,16 +14,16 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             // 1. Header Section
-            _buildHeader(),
+            _buildHeader(context),
 
             // 2. Saldo Section
-            _buildBalanceSection(),
+            _buildBalanceSection(context),
 
             // 3. Budgeting Button
-            _buildBudgetingButton(),
+            _buildBudgetingButton(context),
 
             // 4. Quick Actions
-            _buildQuickActions(),
+            _buildQuickActions(context),
 
             const SizedBox(height: 0),
 
@@ -38,7 +38,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   // Pisahkan tiap bagian ke dalam Method agar build() tidak terlalu panjang
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         16,
@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.brandRed,
+              color: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
@@ -62,10 +62,10 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          const Text(
+          Text(
             'AturAja !',
             style: TextStyle(
-              color: AppColors.brandRed,
+              color: Theme.of(context).primaryColor,
               fontWeight: FontWeight.w900,
               fontSize: 22,
             ),
@@ -75,13 +75,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBalanceSection() {
+  Widget _buildBalanceSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.brandRed,
+          color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -109,7 +109,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBudgetingButton() {
+  Widget _buildBudgetingButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Transform.translate(
@@ -120,7 +120,9 @@ class HomeScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade100),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -129,11 +131,11 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          child: const Center(
+          child: Center(
             child: Text(
               'Budgeting',
               style: TextStyle(
-                color: AppColors.brandRed,
+                color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
@@ -144,14 +146,16 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickActions() {
+  Widget _buildQuickActions(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade100),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+          ),
         ),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -202,6 +206,7 @@ class HomeScreen extends StatelessWidget {
             icon: Icons.description,
             label: 'LinkAja Deals',
             color: Colors.blue,
+            isPromo: true,
           ),
           ServiceItem(
             icon: Icons.directions_car,

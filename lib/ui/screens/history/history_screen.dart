@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import '../../../core/constants/colors.dart';
 import 'history_details_screen.dart';
 
 class Transaction {
@@ -143,21 +141,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final currentMonthTransactions = allTransactions
         .where((tx) => tx.date.contains(activeMonth))
         .toList();
 
-    // Ambil daftar tanggal unik dari transaksi bulan ini (untuk membuat header tanggal)
     final uniqueDates = currentMonthTransactions
         .map((tx) => tx.date)
         .toSet()
         .toList();
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
-            //header
+            // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 32),
               child: Row(
@@ -167,7 +168,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     icon: Icon(
                       Icons.chevron_left,
                       size: 32,
-                      color: Colors.grey[900],
+                      color: colorScheme.onBackground,
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -176,10 +177,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   const SizedBox(width: 16),
                   Text(
                     'History',
-                    style: TextStyle(
-                      fontSize: 20,
+                    style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[900],
+                      color: colorScheme.onBackground,
                     ),
                   ),
                 ],
@@ -192,7 +192,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorScheme.surface,
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(24),
                     ),
@@ -207,7 +207,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      
                       const SizedBox(height: 24),
 
                       // Title
@@ -215,10 +214,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           'Semua Transaksi',
-                          style: TextStyle(
-                            fontSize: 18,
+                          style: textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[900],
+                            color: colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -247,18 +245,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: isActive
-                                        ? AppColors.brandRed
-                                        : Colors.grey[200],
+                                        ? colorScheme.primary
+                                        : colorScheme.surfaceVariant,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
                                     month,
-                                    style: TextStyle(
+                                    style: textTheme.bodyMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 14,
                                       color: isActive
-                                          ? Colors.white
-                                          : Colors.grey[900],
+                                          ? colorScheme.onPrimary
+                                          : colorScheme.onSurface,
                                     ),
                                   ),
                                 ),
@@ -274,26 +271,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border(
-                              top: BorderSide(color: Colors.grey[100]!),
+                              top: BorderSide(color: colorScheme.outline),
                             ),
                           ),
-                          child: uniqueDates.isEmpty 
-                              ? const Center(
+                          child: uniqueDates.isEmpty
+                              ? Center(
                                   child: Text(
                                     "Tidak ada transaksi",
-                                    style: TextStyle(color: Colors.grey),
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
                                   ),
                                 )
-                              // Menggunakan ListView.builder untuk peforma terbaik
                               : ListView.builder(
-                                  padding: const EdgeInsets.only(top: 8, bottom: 24),
+                                  padding: const EdgeInsets.only(
+                                    top: 8,
+                                    bottom: 24,
+                                  ),
                                   itemCount: uniqueDates.length,
                                   itemBuilder: (context, index) {
                                     final date = uniqueDates[index];
                                     final items = currentMonthTransactions
                                         .where((t) => t.date == date)
                                         .toList();
-                                    
+
                                     return TransactionGroup(
                                       date: date,
                                       items: items,
@@ -308,7 +309,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
           ],
-        )
+        ),
       ),
     );
   }
@@ -323,6 +324,10 @@ class TransactionGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       child: Column(
@@ -331,25 +336,24 @@ class TransactionGroup extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            color: Colors.white,
+            color: colorScheme.surface,
             child: Container(
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey[100]!)),
+                border: Border(bottom: BorderSide(color: colorScheme.outline)),
               ),
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
                 date,
-                style: TextStyle(
-                  fontSize: 14,
+                style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey[900],
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
           ),
           ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            shrinkWrap: true, 
+            shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: items.length,
             itemBuilder: (context, index) {
@@ -400,11 +404,14 @@ class _AnimatedTransactionButtonState extends State<AnimatedTransactionButton>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return GestureDetector(
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) {
         _controller.reverse();
-        // Aksi saat transaksi diklik
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -425,61 +432,56 @@ class _AnimatedTransactionButtonState extends State<AnimatedTransactionButton>
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: _isHovered ? Colors.grey[50] : Colors.transparent,
+              color: _isHovered
+                  ? colorScheme.surfaceVariant.withOpacity(0.7)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                // 1. Ikon
                 Container(
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     widget.item.icon,
-                    color: AppColors.brandRed,
+                    color: colorScheme.primary,
                     size: 24,
                   ),
                 ),
                 const SizedBox(width: 16),
-                
-                // 2. Teks Kategori & Waktu dibungkus Expanded
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         widget.item.category,
-                        style: TextStyle(
+                        style: textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey[900],
-                          fontSize: 14,
+                          color: colorScheme.onSurface,
                         ),
-                        maxLines: 1, // Membatasi teks hanya 1 baris
-                        overflow: TextOverflow.ellipsis, // Menambahkan "..." jika teks terlalu panjang
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 2), // Sedikit jarak antar teks
+                      const SizedBox(height: 2),
                       Text(
                         widget.item.time,
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontSize: 12,
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
                   ),
                 ),
-                
                 const SizedBox(width: 8),
                 Text(
                   widget.item.amount,
-                  style: TextStyle(
+                  style: textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[900],
-                    fontSize: 14,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ],

@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       // bg-brand-red
-      backgroundColor: const Color(0xFFD32F2F),
+      backgroundColor: Theme.of(context).primaryColor,
       body: Center(
         child: AnimatedScale(
           scale: _scale,
