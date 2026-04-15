@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/constants/colors.dart';
-import '../home/home_screen.dart' as home;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   // 2. LOGIKA LOGIN DENGAN VALIDASI FORM & SNACKBAR
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     // Mengecek apakah form valid menggunakan GlobalKey
     if (_formKey.currentState!.validate()) {
       // Menampilkan SnackBar (Wajib kriteria ETS)
@@ -56,9 +55,9 @@ class _LoginScreenState extends State<LoginScreen>
       );
 
       // Delay sebentar biar SnackBar kelihatan, lalu pindah halaman
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pushReplacementNamed(context, '/home');
-      });
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
@@ -181,7 +180,9 @@ class _LoginScreenState extends State<LoginScreen>
           fontSize: 12,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.0,
-          color: Theme.of(context).colorScheme.onSurface.withAlpha((0.6 * 255).round()),
+          color: Theme.of(
+            context,
+          ).colorScheme.onSurface.withAlpha((0.6 * 255).round()),
         ),
       ),
     );
@@ -198,7 +199,9 @@ class _LoginScreenState extends State<LoginScreen>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withAlpha((0.2 * 255).round()),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withAlpha((0.2 * 255).round()),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -226,7 +229,9 @@ class _LoginScreenState extends State<LoginScreen>
         Text(
           'Not Registered yet? ',
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withAlpha((0.5 * 255).round()),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withAlpha((0.5 * 255).round()),
             fontWeight: FontWeight.w700,
             fontSize: 12,
           ),
@@ -252,7 +257,9 @@ class _LoginScreenState extends State<LoginScreen>
         fontSize: 14,
       ),
       filled: true,
-      fillColor: theme.colorScheme.surfaceContainerHighest.withAlpha((0.3 * 255).round()),
+      fillColor: theme.colorScheme.surfaceContainerHighest.withAlpha(
+        (0.3 * 255).round(),
+      ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
