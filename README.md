@@ -16,13 +16,23 @@ AturAja menggunakan Model Bisnis Monetisasi berupa biaya transaksi dan layanan, 
 Screenshot Layar Utama Aplikasi : 
 
 1.Splashscreen
+
 ![Authtentication](assets/images/Splashscreen.jpeg)
+
 2.Login
+
 ![Authentication](assets/images/Login.png)
+
 3.Homepage
+
 ![Authentication](assets/images/HomePage.png)
+
 4.History Page
+
 ![Authentication](assets/images/History.png)
+
 5.Detail History Page
+
 ![Authentication](assets/images/Detail%20Transaksi.png)
+
 
