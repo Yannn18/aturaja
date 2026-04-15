@@ -181,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen>
           fontSize: 12,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.0,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+          color: Theme.of(context).colorScheme.onSurface.withAlpha((0.6 * 255).round()),
         ),
       ),
     );
@@ -198,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.primary.withAlpha((0.2 * 255).round()),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -226,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen>
         Text(
           'Not Registered yet? ',
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withAlpha((0.5 * 255).round()),
             fontWeight: FontWeight.w700,
             fontSize: 12,
           ),
@@ -248,11 +248,11 @@ class _LoginScreenState extends State<LoginScreen>
     return InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(
-        color: theme.colorScheme.onSurface.withOpacity(0.4),
+        color: theme.colorScheme.onSurface.withAlpha((0.4 * 255).round()),
         fontSize: 14,
       ),
       filled: true,
-      fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+      fillColor: theme.colorScheme.surfaceContainerHighest.withAlpha((0.3 * 255).round()),
       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

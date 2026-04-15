@@ -23,7 +23,7 @@ class PhoneIllustration extends StatelessWidget {
                 border: Border.all(color: AppColors.phoneBorder, width: 3),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.25),
+                    color: Colors.black.withAlpha((0.25 * 255).round()),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -112,7 +112,7 @@ class PhoneIllustration extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.12),
+                    color: Colors.black.withAlpha((0.12 * 255).round()),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),

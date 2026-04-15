@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/colors.dart';
 import '../../widgets/home_widgets.dart'; // Import widget kustom kita
 
 class HomeScreen extends StatelessWidget {
@@ -121,11 +120,11 @@ class HomeScreen extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withAlpha((0.05 * 255).round()),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -154,7 +153,7 @@ class HomeScreen extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
           ),
         ),
         child: const Row(

@@ -168,7 +168,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     icon: Icon(
                       Icons.chevron_left,
                       size: 32,
-                      color: colorScheme.onBackground,
+                      color: colorScheme.onSurface,
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -179,7 +179,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     'History',
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: colorScheme.onBackground,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -198,7 +198,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withAlpha((0.05 * 255).round()),
                         offset: const Offset(0, -4),
                         blurRadius: 20,
                       ),
@@ -246,7 +246,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   decoration: BoxDecoration(
                                     color: isActive
                                         ? colorScheme.primary
-                                        : colorScheme.surfaceVariant,
+                                        : colorScheme.surfaceContainerHighest,
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
@@ -319,8 +319,7 @@ class TransactionGroup extends StatelessWidget {
   final String date;
   final List<Transaction> items;
 
-  const TransactionGroup({Key? key, required this.date, required this.items})
-    : super(key: key);
+  const TransactionGroup({super.key, required this.date, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -369,8 +368,7 @@ class TransactionGroup extends StatelessWidget {
 class AnimatedTransactionButton extends StatefulWidget {
   final Transaction item;
 
-  const AnimatedTransactionButton({Key? key, required this.item})
-    : super(key: key);
+  const AnimatedTransactionButton({super.key, required this.item});
 
   @override
   State<AnimatedTransactionButton> createState() =>
@@ -433,7 +431,7 @@ class _AnimatedTransactionButtonState extends State<AnimatedTransactionButton>
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: _isHovered
-                  ? colorScheme.surfaceVariant.withOpacity(0.7)
+                  ? colorScheme.surfaceContainerHighest.withAlpha((0.7 * 255).round())
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),

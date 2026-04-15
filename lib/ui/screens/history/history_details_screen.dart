@@ -4,8 +4,7 @@ import 'history_screen.dart'; // Import model Transaction dari file history
 class TransactionDetailScreen extends StatelessWidget {
   final Transaction transaction;
 
-  const TransactionDetailScreen({Key? key, required this.transaction})
-    : super(key: key);
+  const TransactionDetailScreen({super.key, required this.transaction});
 
   String _getMonthYearTag(String date) {
     final parts = date.split(' ');
@@ -36,7 +35,7 @@ class TransactionDetailScreen extends StatelessWidget {
                     icon: Icon(
                       Icons.chevron_left,
                       size: 32,
-                      color: colorScheme.onBackground,
+                      color: colorScheme.onSurface,
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -47,7 +46,7 @@ class TransactionDetailScreen extends StatelessWidget {
                     'Transaction Details',
                     style: textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: colorScheme.onBackground,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -70,7 +69,7 @@ class TransactionDetailScreen extends StatelessWidget {
                         border: Border.all(color: colorScheme.outline),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withAlpha((0.04 * 255).round()),
                             blurRadius: 30,
                             offset: const Offset(0, 8),
                           ),
@@ -131,7 +130,7 @@ class TransactionDetailScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceVariant,
+                        color: colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(color: colorScheme.outline),
                       ),
@@ -188,7 +187,7 @@ class TransactionDetailScreen extends StatelessWidget {
                         border: Border.all(color: colorScheme.outline),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withAlpha((0.04 * 255).round()),
                             blurRadius: 30,
                             offset: const Offset(0, 8),
                           ),
@@ -448,10 +447,10 @@ class AnimatedScaleButton extends StatefulWidget {
   final VoidCallback onTap;
 
   const AnimatedScaleButton({
-    Key? key,
+    super.key,
     required this.child,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedScaleButton> createState() => _AnimatedScaleButtonState();
