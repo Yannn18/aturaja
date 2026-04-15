@@ -1,6 +1,7 @@
 ProjectAturAja
 Kelompok 2 Pemrograman Mobile
-Anggota : 
+Anggota :
+
 1. Dishwar Raya Pradipta 24082010008
 2. Azarya Yanuar Krisyanto 24082010012
 3. Icha Leona Ardianti 24082010015
@@ -13,7 +14,7 @@ AturAja merupakan aplikasi dompet digital yang berfokus pada fitur budgeting dig
 Model Bisnis Monetisasi:
 AturAja menggunakan Model Bisnis Monetisasi berupa biaya transaksi dan layanan, dengan adanya integrasi dengan E-Wallet, AturAja mengambil margin kecil dari transaksi yang dilakukan didalam aplikasi
 
-Screenshot Layar Utama Aplikasi : 
+Screenshot Layar Utama Aplikasi :
 
 1.Splashscreen
 

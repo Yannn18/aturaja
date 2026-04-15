@@ -343,7 +343,9 @@ class TransactionDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(999),
                           boxShadow: [
                             BoxShadow(
-                              color: colorScheme.primary.withOpacity(0.15),
+                              color: colorScheme.primary.withAlpha(
+                                (0.15 * 255).round(),
+                              ),
                               blurRadius: 15,
                               offset: const Offset(0, 8),
                             ),
@@ -379,17 +381,24 @@ class TransactionDetailScreen extends StatelessWidget {
                   const SizedBox(width: 16),
                   AnimatedScaleButton(
                     onTap: () {
-                      // Aksi Download
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Unduhan resi akan segera tersedia.'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      }
                     },
                     child: Container(
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceVariant,
+                        color: colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
+                            color: Colors.black.withAlpha((0.02 * 255).round()),
                             blurRadius: 5,
                             offset: const Offset(0, 2),
                           ),
@@ -419,7 +428,7 @@ class TransactionDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant,
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
