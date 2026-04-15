@@ -437,54 +437,44 @@ class _AnimatedTransactionButtonState extends State<AnimatedTransactionButton>
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    widget.item.icon,
-                    color: colorScheme.primary,
-                    size: 24,
-                  ),
+            child: ListTile(
+              leading: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.item.category,
-                        style: textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.item.time,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: Icon(
+                  widget.item.icon,
+                  color: colorScheme.primary,
+                  size: 24,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  widget.item.amount,
-                  style: textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
-                  ),
+              ),
+              title: Text(
+                widget.item.category,
+                style: textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
                 ),
-              ],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                widget.item.time,
+                style: textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              trailing: Text(
+                widget.item.amount,
+                style: textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              contentPadding: EdgeInsets.zero,
+              dense: true,
             ),
           ),
         ),
