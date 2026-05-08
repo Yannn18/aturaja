@@ -1,3 +1,4 @@
+import 'package:aturaja/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class BudgetingNewScreen extends StatefulWidget {
@@ -13,8 +14,6 @@ class _BudgetingNewScreenState
 
   // ===========================
   // GLOBALKEY FORM
-  // Memenuhi ketentuan:
-  // - Form Validation
   // ===========================
   final _formKey = GlobalKey<FormState>();
 
@@ -32,6 +31,27 @@ class _BudgetingNewScreenState
 
   final TextEditingController periodeController =
       TextEditingController();
+  
+  String selectedTujuan = 'Lainnya';
+
+  final List<String> tujuanList = [
+    'Lainnya',
+    'Liburan',
+    'Makanan',
+    'Pendidikan',
+    'Belanja',
+  ];
+
+  // ===========================
+  // ICON SETIAP TUJUAN
+  // ===========================
+  final Map<String, IconData> tujuanIcons = {
+    'Lainnya': Icons.category,
+    'Liburan': Icons.flight,
+    'Makanan': Icons.fastfood,
+    'Pendidikan': Icons.school,
+    'Belanja': Icons.shopping_bag,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +62,9 @@ class _BudgetingNewScreenState
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final budgetingTheme =
+    Theme.of(context)
+        .extension<BudgetingInputTheme>()!;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -103,101 +126,72 @@ class _BudgetingNewScreenState
                 const SizedBox(height: 30),
 
                 // ===========================
-                // STACK + POSITIONED
-                // Memenuhi ketentuan tugas
+                // FOTO + FORM NAMA
+                // Sesuai desain asli
                 // ===========================
-                Center(
-                  child: Stack(
-                    alignment: Alignment.center,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
 
-                    children: [
+                    // ===========================
+                    // STACK + POSITIONED
+                    // Memenuhi ketentuan tugas
+                    // ===========================
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
 
-                      // Circle Background
-                      Container(
-                        width: 90,
-                        height: 90,
+                        Container(
+                          width: 90,
+                          height: 90,
 
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-
-                      // Icon
-                      Icon(
-                        Icons.wallet,
-                        size: 42,
-                        color: colorScheme.primary,
-                      ),
-
-                      // Positioned Badge
-                      Positioned(
-                        bottom: 2,
-                        right: 2,
-
-                        child: Container(
-                          padding:
-                              const EdgeInsets.all(6),
-
-                          decoration:
-                              BoxDecoration(
-                            color:
-                                colorScheme.primary,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEEEEEE),
                             shape: BoxShape.circle,
                           ),
-
-                          child: const Icon(
-                            Icons.add,
-                            size: 14,
-                            color: Colors.white,
-                          ),
                         ),
+
+                        Icon(
+                          tujuanIcons[selectedTujuan],
+                          size: 42,
+                          color: colorScheme.primary,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(width: 28),
+
+                // ===========================
+                // FORM NAME
+                // ===========================
+                Expanded(
+                  child: TextFormField(
+                    controller: nameController,
+
+                    decoration:
+                      budgetingTheme.underlineDecoration(
+                        hintText: 'Name',
                       ),
-                    ],
+
+                    validator: (value) {
+
+                      if (value == null ||
+                          value.isEmpty) {
+                        return 'Nama tidak boleh kosong';
+                      }
+
+                      if (value.length < 4) {
+                        return 'Minimal 4 karakter';
+                      }
+
+                      return null;
+                    },
                   ),
                 ),
+              ],
+            ),
 
-                const SizedBox(height: 32),
-
-                // ===========================
-                // NAMA BUDGET
-                // ===========================
-                Text(
-                  'Nama Budget',
-                  style: textTheme.bodyMedium,
-                ),
-
-                const SizedBox(height: 10),
-
-                TextFormField(
-                  controller: nameController,
-
-                  decoration:
-                      const InputDecoration(
-                    hintText: 'Masukkan nama budget',
-                  ),
-
-                  // ===========================
-                  // VALIDASI FORM
-                  // ===========================
-                  validator: (value) {
-
-                    if (value == null ||
-                        value.isEmpty) {
-                      return
-                          'Nama budget tidak boleh kosong';
-                    }
-
-                    if (value.length < 4) {
-                      return
-                          'Minimal 4 karakter';
-                    }
-
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 24),
+            const SizedBox(height: 28),
 
                 // ===========================
                 // NOMINAL
@@ -209,33 +203,58 @@ class _BudgetingNewScreenState
 
                 const SizedBox(height: 10),
 
-                TextFormField(
-                  controller: nominalController,
-                  keyboardType:
-                      TextInputType.number,
+                Row(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.end,
 
-                  decoration:
-                      const InputDecoration(
-                    prefixText: 'Rp ',
-                    hintText:
-                        'Masukkan nominal',
-                  ),
+                  children: [
 
-                  validator: (value) {
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(
+                        bottom: 10,
+                      ),
 
-                    if (value == null ||
-                        value.isEmpty) {
-                      return
-                          'Nominal tidak boleh kosong';
-                    }
+                      child: Text(
+                        'Rp',
 
-                    if (value.length < 5) {
-                      return
-                          'Minimal 5 digit';
-                    }
+                        style: textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                          fontWeight:
+                              FontWeight.w500,
+                        ),
+                      ),
+                    ),
 
-                    return null;
-                  },
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: TextFormField(
+                        controller: nominalController,
+
+                        keyboardType:
+                            TextInputType.number,
+
+                        decoration:
+                            budgetingTheme
+                                .underlineDecoration(
+                          hintText: '',
+                        ),
+
+                        validator: (value) {
+
+                          if (value == null ||
+                              value.isEmpty) {
+                            return
+                                'Nominal wajib diisi';
+                          }
+
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 24),
@@ -250,35 +269,65 @@ class _BudgetingNewScreenState
 
                 const SizedBox(height: 10),
 
-                TextFormField(
-                  controller: limitController,
-                  keyboardType:
-                      TextInputType.number,
+                Row(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.end,
 
-                  decoration:
-                      const InputDecoration(
-                    prefixText: 'Rp ',
-                    hintText:
-                        'Masukkan batas nominal',
-                  ),
+                  children: [
 
-                  validator: (value) {
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(
+                        bottom: 10,
+                      ),
 
-                    if (value == null ||
-                        value.isEmpty) {
-                      return
-                          'Batas nominal tidak boleh kosong';
-                    }
+                      child: Text(
+                        'Rp',
 
-                    return null;
-                  },
+                        style: textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                          fontWeight:
+                              FontWeight.w500,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: TextFormField(
+                        controller: limitController,
+
+                        keyboardType:
+                            TextInputType.number,
+
+                        decoration:
+                            budgetingTheme
+                                .underlineDecoration(
+                          hintText: '',
+                        ),
+
+                        validator: (value) {
+
+                          if (value == null ||
+                              value.isEmpty) {
+                            return
+                                'Batas nominal wajib diisi';
+                          }
+
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 24),
 
                 // ===========================
-                // SUMBER DANA CARD
-                // Menggunakan global CardTheme
+                // SUMBER DANA
+                // Border putih sesuai desain
                 // ===========================
                 Text(
                   'Sumber Dana',
@@ -287,136 +336,216 @@ class _BudgetingNewScreenState
 
                 const SizedBox(height: 10),
 
-                Card(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.all(20),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
 
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
 
-                      children: [
-
-                        Text(
-                          'Saldo Utama',
-                          style: textTheme
-                              .bodyMedium,
-                        ),
-
-                        const SizedBox(
-                            height: 8),
-
-                        Text(
-                          'Rp5,200,000',
-
-                          style: textTheme
-                              .headlineSmall
-                              ?.copyWith(
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    border: Border.all(
+                      color: Colors.grey.shade500,
                     ),
+
+                    borderRadius:
+                        BorderRadius.circular(12),
+                  ),
+
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+
+                    children: [
+
+                      Text(
+                        'Saldo Utama',
+                        style: textTheme.bodyMedium,
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      Text(
+                        'Rp5,200,000',
+
+                        style: textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
                 const SizedBox(height: 24),
 
+
                 // ===========================
                 // PERIODE
+                // LABEL DIDALAM BORDER
                 // ===========================
-                Text(
-                  'Periode',
-                  style: textTheme.bodyMedium,
-                ),
+                Container(
+                  width: double.infinity,
 
-                const SizedBox(height: 10),
-
-                TextFormField(
-                  controller:
-                      periodeController,
-
-                  readOnly: true,
-
-                  decoration:
-                      const InputDecoration(
-                    hintText:
-                        'mm/dd/yyyy - mm/dd/yyyy',
-
-                    suffixIcon:
-                        Icon(Icons.date_range),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
                   ),
 
-                  onTap: () async {
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey.shade500,
+                    ),
 
-                    final picked =
-                        await showDateRangePicker(
-                      context: context,
+                    borderRadius:
+                        BorderRadius.circular(12),
 
-                      firstDate:
-                          DateTime(2024),
+                    color: Colors.white,
+                  ),
 
-                      lastDate:
-                          DateTime(2030),
-                    );
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
 
-                    if (picked != null) {
+                    children: [
 
-                      setState(() {
+                      Text(
+                        'Periode',
 
-                        periodeController.text =
-                            '${picked.start.day}/${picked.start.month}/${picked.start.year} - ${picked.end.day}/${picked.end.month}/${picked.end.year}';
-                      });
-                    }
-                  },
+                        style: textTheme.bodySmall
+                            ?.copyWith(
+                          color: Colors.black,
+                        ),
+                      ),
 
-                  validator: (value) {
+                      const SizedBox(height: 8),
 
-                    if (value == null ||
-                        value.isEmpty) {
-                      return
-                          'Periode wajib dipilih';
-                    }
+                      GestureDetector(
 
-                    return null;
-                  },
+                        onTap: () async {
+
+                          final picked =
+                              await showDateRangePicker(
+                            context: context,
+
+                            firstDate:
+                                DateTime(2024),
+
+                            lastDate:
+                                DateTime(2030),
+                          );
+
+                          if (picked != null) {
+
+                            setState(() {
+
+                              periodeController.text =
+                                  '${picked.start.day}/${picked.start.month}/${picked.start.year} - ${picked.end.day}/${picked.end.month}/${picked.end.year}';
+                            });
+                          }
+                        },
+
+                        child: Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment
+                                  .spaceBetween,
+
+                          children: [
+
+                            Text(
+                              periodeController
+                                      .text
+                                      .isEmpty
+                                  ? 'mm/dd/yyyy - mm/dd/yyyy'
+                                  : periodeController
+                                      .text,
+
+                              style: textTheme
+                                  .bodyMedium,
+                            ),
+
+                            Icon(
+                              Icons.date_range,
+                              color:
+                                  colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 24),
 
                 // ===========================
                 // TUJUAN ALOKASI
+                // LABEL DIDALAM BORDER
                 // ===========================
-                Text(
-                  'Tujuan Alokasi',
-                  style: textTheme.bodyMedium,
-                ),
+                Container(
+                  width: double.infinity,
 
-                const SizedBox(height: 10),
-
-                TextFormField(
-                  controller:
-                      tujuanController,
-
-                  decoration:
-                      const InputDecoration(
-                    hintText:
-                        'Contoh: Liburan, Pendidikan',
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
                   ),
 
-                  validator: (value) {
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey.shade500,
+                    ),
 
-                    if (value == null ||
-                        value.isEmpty) {
-                      return
-                          'Tujuan alokasi wajib diisi';
-                    }
+                    borderRadius:
+                        BorderRadius.circular(12),
 
-                    return null;
-                  },
+                    color: Colors.white,
+                  ),
+
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
+
+                    children: [
+
+                      Text(
+                        'Tujuan Alokasi',
+
+                        style: textTheme.bodySmall
+                            ?.copyWith(
+                          color: Colors.black,
+                        ),
+                      ),
+
+                      DropdownButtonHideUnderline(
+
+                        child: DropdownButton<String>(
+
+                          value: selectedTujuan,
+
+                          isExpanded: true,
+
+                          items: tujuanList.map((item) {
+
+                            return DropdownMenuItem(
+                              value: item,
+
+                              child: Text(item),
+                            );
+                          }).toList(),
+
+                          onChanged: (value) {
+
+                            setState(() {
+
+                              selectedTujuan =
+                                  value!;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 40),

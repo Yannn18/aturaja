@@ -25,6 +25,14 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.brandRed, width: 1.5),
         ),
       ),
+      
+      // ===========================
+// THEME KHUSUS UNDERLINE INPUT
+// Untuk budgeting_new_screen
+// ===========================
+extensions: <ThemeExtension<dynamic>>[
+  const BudgetingInputTheme(),
+],
 
       textTheme: const TextTheme(
         headlineMedium: TextStyle(
@@ -77,5 +85,109 @@ class AppTheme {
         foregroundColor: Colors.white,
       ),
     );
+  }
+}
+// ===========================
+// CUSTOM THEME EXTENSION
+// ===========================
+@immutable
+class BudgetingInputTheme
+    extends ThemeExtension<BudgetingInputTheme> {
+
+  const BudgetingInputTheme();
+
+  InputDecoration underlineDecoration({
+    required String hintText,
+  }) {
+
+    return InputDecoration(
+      hintText: hintText,
+
+      filled: false,
+
+      contentPadding:
+          const EdgeInsets.symmetric(
+        vertical: 10,
+      ),
+
+      border: const UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Color(0xFF767676),
+        ),
+      ),
+
+      enabledBorder:
+          const UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Color(0xFF767676),
+        ),
+      ),
+
+      focusedBorder:
+          const UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: AppColors.brandRed,
+          width: 2,
+        ),
+      ),
+    );
+  }
+
+  InputDecoration outlineDecoration({
+    required String hintText,
+    Widget? suffixIcon,
+  }) {
+
+    return InputDecoration(
+      hintText: hintText,
+
+      filled: false,
+
+      suffixIcon: suffixIcon,
+
+      contentPadding:
+          const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 18,
+      ),
+
+      border: OutlineInputBorder(
+        borderRadius:
+            BorderRadius.circular(12),
+      ),
+
+      enabledBorder: OutlineInputBorder(
+        borderRadius:
+            BorderRadius.circular(12),
+
+        borderSide: BorderSide(
+          color: Colors.grey.shade500,
+        ),
+      ),
+
+      focusedBorder: OutlineInputBorder(
+        borderRadius:
+            BorderRadius.circular(12),
+
+        borderSide: const BorderSide(
+          color: AppColors.brandRed,
+          width: 2,
+        ),
+      ),
+    );
+  }
+
+  @override
+  ThemeExtension<BudgetingInputTheme>
+      copyWith() {
+    return const BudgetingInputTheme();
+  }
+
+  @override
+  ThemeExtension<BudgetingInputTheme> lerp(
+    covariant ThemeExtension<BudgetingInputTheme>? other,
+    double t,
+  ) {
+    return this;
   }
 }
