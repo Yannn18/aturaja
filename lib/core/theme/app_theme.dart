@@ -56,6 +56,26 @@ class AppTheme {
           ),
         ),
       ),
+      cardTheme: CardThemeData(
+        color: const Color(0xFFF3F3F3),
+
+        elevation: 0,
+
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+
+        margin: const EdgeInsets.only(bottom: 18),
+      ),
+
+      // ===========================
+      // FAB THEME
+      // ===========================
+      floatingActionButtonTheme:
+          const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.brandRed,
+        foregroundColor: Colors.white,
+      ),
     );
   }
 }

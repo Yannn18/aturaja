@@ -113,15 +113,34 @@ class HomeScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Transform.translate(
         offset: const Offset(0, -15),
+          // Membuat tombol bisa ditekan
+      // ===========================
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+
+        // ===========================
+        // NAVIGATOR PUSH NAMED
+        // Routing ke halaman budgeting
+        // ===========================
+        onTap: () {
+          Navigator.pushNamed(context, '/budgeting');
+        },
+
         child: Container(
           width: double.infinity,
           height: 50,
+
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
+
             border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withAlpha((0.1 * 255).round()),
             ),
+
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withAlpha((0.05 * 255).round()),
@@ -130,6 +149,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
+
           child: Center(
             child: Text(
               'Budgeting',
@@ -142,8 +162,9 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildQuickActions(BuildContext context) {
     return Padding(

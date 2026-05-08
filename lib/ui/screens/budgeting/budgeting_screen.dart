@@ -54,41 +54,6 @@ final List<BudgetItem> allBudgets = [
     totalBudget: 350000,
     icon: Icons.wifi,
   ),
-  BudgetItem(
-    id: '6',
-    title: 'Listrik',
-    usedBudget: 180000,
-    totalBudget: 300000,
-    icon: Icons.electrical_services,
-  ),
-  BudgetItem(
-    id: '7',
-    title: 'Hiburan',
-    usedBudget: 50000,
-    totalBudget: 120000,
-    icon: Icons.movie,
-  ),
-  BudgetItem(
-    id: '8',
-    title: 'Kesehatan',
-    usedBudget: 70000,
-    totalBudget: 100000,
-    icon: Icons.medical_services,
-  ),
-  BudgetItem(
-    id: '9',
-    title: 'Ojek Online',
-    usedBudget: 25000,
-    totalBudget: 70000,
-    icon: Icons.two_wheeler,
-  ),
-  BudgetItem(
-    id: '10',
-    title: 'E-Wallet',
-    usedBudget: 50000,
-    totalBudget: 150000,
-    icon: Icons.account_balance_wallet,
-  ),
 ];
 
 class BudgetingScreen extends StatefulWidget {
@@ -113,44 +78,6 @@ class _BudgetingScreenState extends State<BudgetingScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
 
       // FAB Thumb Zone
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) => const AddBudgetDialog(),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text("Add New"),
-      ),
-
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.centerDocked,
-
-      // Bottom Navigation
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
-        onTap: (value) {
-          setState(() {
-            selectedIndex = value;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.wallet),
-            label: 'Budget',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
-
       body: SafeArea(
         child: Column(
           children: [
@@ -240,88 +167,11 @@ class _BudgetingScreenState extends State<BudgetingScreen> {
 
                     const SizedBox(height: 24),
 
-                    // STACK + POSITIONED
-                    Stack(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primaryContainer,
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.notifications_active,
-                                color: colorScheme.primary,
-                              ),
-
-                              const SizedBox(width: 12),
-
-                              Expanded(
-                                child: Text(
-                                  '2 Budget hampir melewati batas',
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Text(
-                              '2',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // LIST TITLE
-                    Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Daftar Budget',
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        Text(
-                          '${allBudgets.length} Items',
-                          style: textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
                     // DYNAMIC LIST
-                    Expanded(
+                    // ===========================
+                    // LIST BUDGET
+                    // ===========================
+                    Flexible(
                       child: ListView.builder(
                         itemCount: allBudgets.length,
                         itemBuilder: (context, index) {
@@ -329,6 +179,42 @@ class _BudgetingScreenState extends State<BudgetingScreen> {
 
                           return BudgetCard(item: item);
                         },
+                      ),
+                    ),
+
+                    // ===========================
+                    // ADD NEW BUTTON
+                    // Ikut scroll bersama content
+                    // ===========================
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 12,
+                        bottom: 24,
+                      ),
+
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 55,
+
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  const AddBudgetDialog(),
+                            );
+                          },
+
+                          icon: const Icon(Icons.add),
+
+                          label: const Text(
+                            'Add New',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -363,14 +249,9 @@ class _BudgetCardState extends State<BudgetCard> {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 18),
-      padding: const EdgeInsets.all(16),
-
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(18),
-      ),
+    return Card(
+    child: Padding(
+    padding: const EdgeInsets.all(16),
 
       child: Column(
         children: [
@@ -460,9 +341,10 @@ class _BudgetCardState extends State<BudgetCard> {
             child: LinearProgressIndicator(
               minHeight: 14,
               value: widget.item.progress,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
