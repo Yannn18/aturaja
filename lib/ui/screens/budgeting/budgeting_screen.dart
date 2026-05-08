@@ -198,10 +198,9 @@ class _BudgetingScreenState extends State<BudgetingScreen> {
 
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  const AddBudgetDialog(),
+                            Navigator.pushNamed(
+                              context,
+                              '/budgeting-new',
                             );
                           },
 
@@ -346,103 +345,6 @@ class _BudgetCardState extends State<BudgetCard> {
           ],
         ),
       ),
-    );
-  }
-}
-
-class AddBudgetDialog extends StatefulWidget {
-  const AddBudgetDialog({super.key});
-
-  @override
-  State<AddBudgetDialog> createState() =>
-      _AddBudgetDialogState();
-}
-
-class _AddBudgetDialogState extends State<AddBudgetDialog> {
-  final _formKey = GlobalKey<FormState>();
-
-  final TextEditingController titleController =
-      TextEditingController();
-
-  final TextEditingController amountController =
-      TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Tambah Budget'),
-
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: titleController,
-              decoration: const InputDecoration(
-                labelText: 'Nama Budget',
-              ),
-
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Nama budget tidak boleh kosong';
-                }
-
-                if (value.length < 4) {
-                  return 'Minimal 4 karakter';
-                }
-
-                return null;
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            TextFormField(
-              controller: amountController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Jumlah Budget',
-              ),
-
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Jumlah budget tidak boleh kosong';
-                }
-
-                if (value.length < 5) {
-                  return 'Minimal 5 digit';
-                }
-
-                return null;
-              },
-            ),
-          ],
-        ),
-      ),
-
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Batal'),
-        ),
-
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content:
-                      Text('Budget baru berhasil ditambahkan'),
-                ),
-              );
-            }
-          },
-          child: const Text('Simpan'),
-        ),
-      ],
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:aturaja/ui/screens/app.dart';
+import 'package:aturaja/ui/screens/budgeting/budgeting_new_screen.dart';
 import 'package:aturaja/ui/screens/budgeting/budgeting_screen.dart';
 import 'package:aturaja/ui/screens/history/history_screen.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,8 @@ class MyApp extends StatelessWidget {
         '/login' : (context) => const LoginScreen(),
         '/home': (context) => const App(),
         '/history': (context) => const HistoryScreen(),
-        '/budgeting': (context) => const BudgetingScreen()
+        '/budgeting': (context) => const BudgetingScreen(),
+        '/budgeting-new': (context) => const BudgetingNewScreen(),
       },
     );
   }
