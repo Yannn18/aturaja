@@ -167,27 +167,37 @@ class HomeScreen extends StatelessWidget {
 }
 
   Widget _buildQuickActions(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
-          ),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            QuickActionItem(icon: Icons.add_circle_outline, label: 'Top Up'),
-            QuickActionItem(icon: Icons.send_outlined, label: 'Transfer'),
-            QuickActionItem(icon: Icons.pie_chart_outline, label: 'Rekap'),
-          ],
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
         ),
       ),
-    );
-  }
+      child: Row( // Hilangkan 'const' di sini karena ada fungsi Navigator
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          QuickActionItem(
+            icon: Icons.add_circle_outline,
+            label: 'Top Up',
+            onTap: () {
+              // ===========================
+              // NAVIGATOR PUSH NAMED
+              // Routing ke halaman top-up
+              // ===========================
+              Navigator.pushNamed(context, '/topup');
+            },
+          ),
+          const QuickActionItem(icon: Icons.send_outlined, label: 'Transfer'),
+          const QuickActionItem(icon: Icons.pie_chart_outline, label: 'Rekap'),
+        ],
+      ),
+    ),
+  );
+}
 
   Widget _buildServicesGrid() {
     return Padding(

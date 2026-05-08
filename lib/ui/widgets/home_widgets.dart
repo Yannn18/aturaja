@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 // Widget Kartu Saldo Kecil
@@ -52,8 +54,14 @@ class BalanceCard extends StatelessWidget {
 class QuickActionItem extends StatelessWidget {
   final IconData icon;
   final String label;
+  final VoidCallback? onTap;
 
-  const QuickActionItem({super.key, required this.icon, required this.label});
+  const QuickActionItem({
+    super.key, 
+    required this.icon, 
+    required this.label, 
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,27 +69,35 @@ class QuickActionItem extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: colorScheme.primary.withAlpha((0.1 * 255).round()),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: colorScheme.primary, size: 28),
+    // Gunakan InkWell untuk mendeteksi klik dan memberikan efek visual
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16), // Sesuai dengan area klik
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withAlpha((0.1 * 255).round()),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: colorScheme.primary, size: 28),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: textTheme.bodySmall?.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: textTheme.bodySmall?.copyWith(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: colorScheme.primary,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
