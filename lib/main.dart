@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 import 'ui/screens/splash/splash_screen.dart';
 import 'ui/screens/login/login_screen.dart';
-
+import 'ui/screens/topup/top_up_screen.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
         '/history': (context) => const HistoryScreen(),
         '/budgeting': (context) => const BudgetingScreen(),
         '/budgeting-new': (context) => const BudgetingNewScreen(),
+        '/topup': (context) => const TopUpScreen(),
       },
     );
   }
