@@ -1,37 +1,30 @@
 import 'package:aturaja/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'pin_verification_screen.dart'; 
 
 class BudgetingNewScreen extends StatefulWidget {
   const BudgetingNewScreen({super.key});
 
   @override
-  State<BudgetingNewScreen> createState() =>
-      _BudgetingNewScreenState();
+  State<BudgetingNewScreen> createState() => _BudgetingNewScreenState();
 }
 
-class _BudgetingNewScreenState
-    extends State<BudgetingNewScreen> {
-
+class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
   // ===========================
   // GLOBALKEY FORM
   // ===========================
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController nameController =
-      TextEditingController();
+  final TextEditingController nameController = TextEditingController();
 
-  final TextEditingController nominalController =
-      TextEditingController();
+  final TextEditingController nominalController = TextEditingController();
 
-  final TextEditingController limitController =
-      TextEditingController();
+  final TextEditingController limitController = TextEditingController();
 
-  final TextEditingController tujuanController =
-      TextEditingController();
+  final TextEditingController tujuanController = TextEditingController();
 
-  final TextEditingController periodeController =
-      TextEditingController();
-  
+  final TextEditingController periodeController = TextEditingController();
+
   String selectedTujuan = 'Lainnya';
 
   final List<String> tujuanList = [
@@ -55,49 +48,39 @@ class _BudgetingNewScreenState
 
   @override
   Widget build(BuildContext context) {
-
     // ===========================
     // GLOBAL THEME
     // ===========================
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final budgetingTheme =
-    Theme.of(context)
-        .extension<BudgetingInputTheme>()!;
+    final budgetingTheme = Theme.of(context).extension<BudgetingInputTheme>()!;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
 
       body: SafeArea(
-
         // ===========================
         // SINGLECHILDSCROLLVIEW
         // Menghindari overflow
         // ===========================
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 24,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
 
           child: Form(
             key: _formKey,
 
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
 
               children: [
-
                 // ===========================
                 // HEADER
                 // ===========================
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () =>
-                          Navigator.pop(context),
+                      onPressed: () => Navigator.pop(context),
 
                       icon: Icon(
                         Icons.chevron_left,
@@ -111,10 +94,8 @@ class _BudgetingNewScreenState
                         'Buat Alokasi Budget',
                         textAlign: TextAlign.center,
 
-                        style: textTheme.titleLarge
-                            ?.copyWith(
-                          fontWeight:
-                              FontWeight.bold,
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -132,7 +113,6 @@ class _BudgetingNewScreenState
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-
                     // ===========================
                     // STACK + POSITIONED
                     // Memenuhi ketentuan tugas
@@ -140,7 +120,6 @@ class _BudgetingNewScreenState
                     Stack(
                       alignment: Alignment.center,
                       children: [
-
                         Container(
                           width: 90,
                           height: 90,
@@ -161,68 +140,54 @@ class _BudgetingNewScreenState
 
                     const SizedBox(width: 28),
 
-                // ===========================
-                // FORM NAME
-                // ===========================
-                Expanded(
-                  child: TextFormField(
-                    controller: nameController,
+                    // ===========================
+                    // FORM NAME
+                    // ===========================
+                    Expanded(
+                      child: TextFormField(
+                        controller: nameController,
 
-                    decoration:
-                      budgetingTheme.underlineDecoration(
-                        hintText: 'Name',
+                        decoration: budgetingTheme.underlineDecoration(
+                          hintText: 'Name',
+                        ),
+
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Nama tidak boleh kosong';
+                          }
+
+                          if (value.length < 4) {
+                            return 'Minimal 4 karakter';
+                          }
+
+                          return null;
+                        },
                       ),
-
-                    validator: (value) {
-
-                      if (value == null ||
-                          value.isEmpty) {
-                        return 'Nama tidak boleh kosong';
-                      }
-
-                      if (value.length < 4) {
-                        return 'Minimal 4 karakter';
-                      }
-
-                      return null;
-                    },
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
 
-            const SizedBox(height: 28),
+                const SizedBox(height: 28),
 
                 // ===========================
                 // NOMINAL
                 // ===========================
-                Text(
-                  'Nominal',
-                  style: textTheme.bodyMedium,
-                ),
+                Text('Nominal', style: textTheme.bodyMedium),
 
                 const SizedBox(height: 10),
 
                 Row(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
 
                   children: [
-
                     Padding(
-                      padding:
-                          const EdgeInsets.only(
-                        bottom: 10,
-                      ),
+                      padding: const EdgeInsets.only(bottom: 10),
 
                       child: Text(
                         'Rp',
 
-                        style: textTheme
-                            .headlineSmall
-                            ?.copyWith(
-                          fontWeight:
-                              FontWeight.w500,
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -233,21 +198,15 @@ class _BudgetingNewScreenState
                       child: TextFormField(
                         controller: nominalController,
 
-                        keyboardType:
-                            TextInputType.number,
+                        keyboardType: TextInputType.number,
 
-                        decoration:
-                            budgetingTheme
-                                .underlineDecoration(
+                        decoration: budgetingTheme.underlineDecoration(
                           hintText: '',
                         ),
 
                         validator: (value) {
-
-                          if (value == null ||
-                              value.isEmpty) {
-                            return
-                                'Nominal wajib diisi';
+                          if (value == null || value.isEmpty) {
+                            return 'Nominal wajib diisi';
                           }
 
                           return null;
@@ -262,33 +221,22 @@ class _BudgetingNewScreenState
                 // ===========================
                 // BATAS NOMINAL
                 // ===========================
-                Text(
-                  'Batas Nominal',
-                  style: textTheme.bodyMedium,
-                ),
+                Text('Batas Nominal', style: textTheme.bodyMedium),
 
                 const SizedBox(height: 10),
 
                 Row(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
 
                   children: [
-
                     Padding(
-                      padding:
-                          const EdgeInsets.only(
-                        bottom: 10,
-                      ),
+                      padding: const EdgeInsets.only(bottom: 10),
 
                       child: Text(
                         'Rp',
 
-                        style: textTheme
-                            .headlineSmall
-                            ?.copyWith(
-                          fontWeight:
-                              FontWeight.w500,
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -299,21 +247,15 @@ class _BudgetingNewScreenState
                       child: TextFormField(
                         controller: limitController,
 
-                        keyboardType:
-                            TextInputType.number,
+                        keyboardType: TextInputType.number,
 
-                        decoration:
-                            budgetingTheme
-                                .underlineDecoration(
+                        decoration: budgetingTheme.underlineDecoration(
                           hintText: '',
                         ),
 
                         validator: (value) {
-
-                          if (value == null ||
-                              value.isEmpty) {
-                            return
-                                'Batas nominal wajib diisi';
+                          if (value == null || value.isEmpty) {
+                            return 'Batas nominal wajib diisi';
                           }
 
                           return null;
@@ -329,10 +271,7 @@ class _BudgetingNewScreenState
                 // SUMBER DANA
                 // Border putih sesuai desain
                 // ===========================
-                Text(
-                  'Sumber Dana',
-                  style: textTheme.bodyMedium,
-                ),
+                Text('Sumber Dana', style: textTheme.bodyMedium),
 
                 const SizedBox(height: 10),
 
@@ -343,35 +282,24 @@ class _BudgetingNewScreenState
                   decoration: BoxDecoration(
                     color: Colors.white,
 
-                    border: Border.all(
-                      color: Colors.grey.shade500,
-                    ),
+                    border: Border.all(color: Colors.grey.shade500),
 
-                    borderRadius:
-                        BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
 
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-
-                      Text(
-                        'Saldo Utama',
-                        style: textTheme.bodyMedium,
-                      ),
+                      Text('Saldo Utama', style: textTheme.bodyMedium),
 
                       const SizedBox(height: 6),
 
                       Text(
                         'Rp5,200,000',
 
-                        style: textTheme
-                            .headlineSmall
-                            ?.copyWith(
-                          fontWeight:
-                              FontWeight.bold,
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -379,7 +307,6 @@ class _BudgetingNewScreenState
                 ),
 
                 const SizedBox(height: 24),
-
 
                 // ===========================
                 // PERIODE
@@ -394,27 +321,21 @@ class _BudgetingNewScreenState
                   ),
 
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey.shade500,
-                    ),
+                    border: Border.all(color: Colors.grey.shade500),
 
-                    borderRadius:
-                        BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12),
 
                     color: Colors.white,
                   ),
 
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-
                       Text(
                         'Periode',
 
-                        style: textTheme.bodySmall
-                            ?.copyWith(
+                        style: textTheme.bodySmall?.copyWith(
                           color: Colors.black,
                         ),
                       ),
@@ -422,24 +343,17 @@ class _BudgetingNewScreenState
                       const SizedBox(height: 8),
 
                       GestureDetector(
-
                         onTap: () async {
-
-                          final picked =
-                              await showDateRangePicker(
+                          final picked = await showDateRangePicker(
                             context: context,
 
-                            firstDate:
-                                DateTime(2024),
+                            firstDate: DateTime(2024),
 
-                            lastDate:
-                                DateTime(2030),
+                            lastDate: DateTime(2030),
                           );
 
                           if (picked != null) {
-
                             setState(() {
-
                               periodeController.text =
                                   '${picked.start.day}/${picked.start.month}/${picked.start.year} - ${picked.end.day}/${picked.end.month}/${picked.end.year}';
                             });
@@ -447,29 +361,18 @@ class _BudgetingNewScreenState
                         },
 
                         child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment
-                                  .spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                           children: [
-
                             Text(
-                              periodeController
-                                      .text
-                                      .isEmpty
+                              periodeController.text.isEmpty
                                   ? 'mm/dd/yyyy - mm/dd/yyyy'
-                                  : periodeController
-                                      .text,
+                                  : periodeController.text,
 
-                              style: textTheme
-                                  .bodyMedium,
+                              style: textTheme.bodyMedium,
                             ),
 
-                            Icon(
-                              Icons.date_range,
-                              color:
-                                  colorScheme.primary,
-                            ),
+                            Icon(Icons.date_range, color: colorScheme.primary),
                           ],
                         ),
                       ),
@@ -492,41 +395,32 @@ class _BudgetingNewScreenState
                   ),
 
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey.shade500,
-                    ),
+                    border: Border.all(color: Colors.grey.shade500),
 
-                    borderRadius:
-                        BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12),
 
                     color: Colors.white,
                   ),
 
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-
                       Text(
                         'Tujuan Alokasi',
 
-                        style: textTheme.bodySmall
-                            ?.copyWith(
+                        style: textTheme.bodySmall?.copyWith(
                           color: Colors.black,
                         ),
                       ),
 
                       DropdownButtonHideUnderline(
-
                         child: DropdownButton<String>(
-
                           value: selectedTujuan,
 
                           isExpanded: true,
 
                           items: tujuanList.map((item) {
-
                             return DropdownMenuItem(
                               value: item,
 
@@ -535,11 +429,8 @@ class _BudgetingNewScreenState
                           }).toList(),
 
                           onChanged: (value) {
-
                             setState(() {
-
-                              selectedTujuan =
-                                  value!;
+                              selectedTujuan = value!;
                             });
                           },
                         ),
@@ -558,35 +449,30 @@ class _BudgetingNewScreenState
                   height: 55,
 
                   child: ElevatedButton(
-
+                    // Cari bagian onPressed pada ElevatedButton "Simpan" Anda:
                     onPressed: () {
+                      // 1. Jalankan Validasi Form (GlobalKey)
+                      if (_formKey.currentState!.validate()) {
+                        // 2. Kumpulkan data dari form (Kriteria Pengiriman Data/Argument Passing)
+                        final budgetData = {
+                          'name': nameController.text,
+                          'nominal': nominalController.text,
+                          'limit': limitController.text,
+                          'tujuan': selectedTujuan,
+                        };
 
-                      // ===========================
-                      // VALIDASI FORM
-                      // ===========================
-                      if (_formKey.currentState!
-                          .validate()) {
-
-                        // ===========================
-                        // FEEDBACK SNACKBAR
-                        // ===========================
-                        ScaffoldMessenger.of(
-                                context)
-                            .showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Budget berhasil dibuat',
-                            ),
+                        // 3. Pindah ke halaman PIN dengan membawa data kustom di atas
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PinVerificationScreen(budgetData: budgetData),
                           ),
                         );
-
-                        Navigator.pop(context);
                       }
                     },
 
-                    child: const Text(
-                      'Simpan',
-                    ),
+                    child: const Text('Simpan'),
                   ),
                 ),
 
