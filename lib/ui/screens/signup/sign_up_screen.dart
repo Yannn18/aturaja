@@ -1,60 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  // GlobalKey untuk validasi form
+class _SignUpScreenState extends State<SignUpScreen> {
+  // Tambahkan GlobalKey untuk validasi form
   final _formKey = GlobalKey<FormState>();
 
+  final Color brandRed = const Color(0xFFD40300);
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  // Warna brand merah pekat dari desain Anda
-  final Color brandRed = const Color(0xFFD40300);
 
   @override
   void dispose() {
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  // Fungsi Logika Login
-  Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      // Tampilkan loading (opsional tapi disarankan UX-nya)
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-
-      // Simulasi proses internet ke Firebase selama 1 detik
-      await Future.delayed(const Duration(seconds: 1));
-
-      if (!mounted) return;
-
-      // Tutup loading
-      Navigator.pop(context);
-
-      // Tampilkan SnackBar sukses
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login Berhasil! Selamat Datang.'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-
-      // Pindah ke Dashboard dan hancurkan rute login
-      Navigator.pushReplacementNamed(context, '/home');
-    }
   }
 
   @override
@@ -64,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 40.0),
+          // Bungkus dengan Form agar validator berfungsi
           child: Form(
             key: _formKey,
             child: Column(
@@ -72,7 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 // ==========================================
                 // 1. AREA ILUSTRASI & JUDUL
                 // ==========================================
-                // TODO: Pastikan nama file gambar ini ada di folder assets Anda
                 Image.asset(
                   'assets/images/amico.png',
                   height: 180,
@@ -81,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 24),
 
                 const Text(
-                  'Masuk',
+                  'Daftar',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -98,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   hint: 'Phone number',
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
+                  // Terapkan formatter agar HANYA ANGKA yang bisa diketik
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -126,10 +93,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 48),
 
                 // ==========================================
-                // 3. AREA TOMBOL LOGIN
+                // 3. AREA TOMBOL DAFTAR
                 // ==========================================
                 SizedBox(
-                  width: 140, // Lebar tombol disesuaikan dengan proporsi gambar
+                  width: 140,
                   height: 48,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -140,9 +107,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       elevation: 3,
                     ),
-                    onPressed: _handleLogin,
+                    onPressed: () {
+                      // Cek apakah inputan valid sebelum diproses
+                      if (_formKey.currentState!.validate()) {
+                        // TODO: Tambahkan logika Firebase Authentication di sini
+                        print("Phone: ${_phoneController.text}");
+                        print("Password: ${_passwordController.text}");
+                      }
+                    },
                     child: const Text(
-                      'Login',
+                      'Daftar',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
@@ -153,19 +127,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 32),
 
                 // ==========================================
-                // 4. AREA FOOTER (Navigasi ke Sign Up)
+                // 4. AREA FOOTER (Navigasi Login)
                 // ==========================================
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, '/signup');
+                    Navigator.pop(context);
                   },
                   child: RichText(
                     text: const TextSpan(
                       style: TextStyle(fontSize: 13, color: Colors.black87),
                       children: [
-                        TextSpan(text: 'Baru di Atur Aja? '),
+                        TextSpan(text: 'Sudah Punya Akun? '),
                         TextSpan(
-                          text: 'Daftar',
+                          text: 'Masuk',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -184,21 +158,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // ==========================================
-  // WIDGET HELPER: Komponen Kolom Input Sesuai Figma
+  // WIDGET HELPER: Komponen Kolom Input Reusable
   // ==========================================
   Widget _buildInputField({
     required String label,
     required String hint,
-    required TextEditingController controller,
+    TextEditingController? controller,
     bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
+    // Jadikan opsional agar kolom password tidak error
     List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label di atas kotak
         Text(
           label,
           style: const TextStyle(
@@ -208,13 +182,13 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         const SizedBox(height: 10),
-
-        // Kotak Input (TextFormField) Outline Hitam
         TextFormField(
           controller: controller,
           obscureText: isPassword,
           keyboardType: keyboardType,
+          // Teruskan parameter inputFormatters ke dalam TextFormField
           inputFormatters: inputFormatters,
+          // Teruskan parameter validator
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
@@ -223,17 +197,15 @@ class _LoginScreenState extends State<LoginScreen> {
               horizontal: 20,
               vertical: 18,
             ),
-            // Desain batas (border) saat diam
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
               borderSide: const BorderSide(color: Colors.black87, width: 1),
             ),
-            // Desain batas saat di-klik/fokus
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
               borderSide: BorderSide(color: brandRed, width: 2),
             ),
-            // Desain batas saat error validasi
+            // Tambahkan desain batas saat terjadi error (validasi gagal)
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(24),
               borderSide: const BorderSide(color: Colors.red, width: 1),
