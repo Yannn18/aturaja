@@ -1,3 +1,5 @@
+import 'package:aturaja/data/models/budget_item_model.dart';
+import 'package:aturaja/data/repositories/budget_repository.dart';
 import 'package:flutter/material.dart';
 
 class BudgetSuccessScreen extends StatelessWidget {
@@ -10,6 +12,7 @@ class BudgetSuccessScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
 
+    final String nominalString = budgetData['nominal'] ?? '0';
     // Mengambil data kiriman secara aman dengan fallback value jika kosong
     final String name = budgetData['name'] ?? 'Alokasi Baru';
     final String nominal = budgetData['nominal'] ?? '0';
@@ -111,9 +114,60 @@ class BudgetSuccessScreen extends StatelessWidget {
                     ),
                     elevation: 0,
                   ),
-                  onPressed: () {
-                    // Membersihkan tumpukan navigasi dan kembali ke Dashboard utama (halaman pertama)
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  // Di dalam file budget_success_screen.dart pada bagian ElevatedButton:
+                  onPressed: () async {
+                    // 1. Tampilkan loading dialog
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (loadingContext) =>
+                          const Center(child: CircularProgressIndicator()),
+                    );
+
+                    // 2. Siapkan data object yang akan dikirim ke Firebase
+                    final newBudget = BudgetItemModel(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      title: name,
+                      usedBudget: 0,
+                      totalBudget: int.tryParse(nominalString) ?? 0,
+                      category: tujuan,
+                    );
+
+                    try {
+                      // 3. Eksekusi tembak data ke Firebase cloud
+                      final BudgetRepository repo = BudgetRepository();
+                      await repo.addBudget(newBudget);
+
+                      // 4. SEBELUM pindah halaman, pastikan loading dialog ditutup duluan!
+                      if (context.mounted) {
+                        Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pop(); // Menutup dialog loading secara spesifik
+                      }
+
+                      // 5. Kembalikan user ke halaman dashboard utama (Halaman Pertama)
+                      if (context.mounted) {
+                        Navigator.of(
+                          context,
+                        ).popUntil((route) => route.isFirst);
+                      }
+                    } catch (e) {
+                      // 6. Jika terjadi error, tutup loading dialog dan tampilkan SnackBar
+                      if (context.mounted) {
+                        Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pop(); // Tutup loading
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Gagal sinkronisasi cloud: $e"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
                   },
                   child: const Text(
                     'Kembali ke Dashboard',

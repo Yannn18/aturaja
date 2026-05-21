@@ -1,6 +1,6 @@
 import 'package:aturaja/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'pin_verification_screen.dart'; 
+import 'pin_verification_screen.dart';
 
 class BudgetingNewScreen extends StatefulWidget {
   const BudgetingNewScreen({super.key});
@@ -93,10 +93,7 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
                       child: Text(
                         'Buat Alokasi Budget',
                         textAlign: TextAlign.center,
-
-                        style: textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: textTheme.headlineMedium,
                       ),
                     ),
 
@@ -125,7 +122,7 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
                           height: 90,
 
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEEEEEE),
+                            color: colorScheme.surfaceVariant,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -182,14 +179,7 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-
-                      child: Text(
-                        'Rp',
-
-                        style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      child: Text('Rp', style: textTheme.headlineSmall),
                     ),
 
                     const SizedBox(width: 12),
@@ -231,14 +221,7 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-
-                      child: Text(
-                        'Rp',
-
-                        style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      child: Text('Rp', style: textTheme.headlineSmall),
                     ),
 
                     const SizedBox(width: 12),
@@ -280,10 +263,8 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
                   padding: const EdgeInsets.all(20),
 
                   decoration: BoxDecoration(
-                    color: Colors.white,
-
-                    border: Border.all(color: Colors.grey.shade500),
-
+                    color: colorScheme.surface,
+                    border: Border.all(color: colorScheme.outline),
                     borderRadius: BorderRadius.circular(12),
                   ),
 
@@ -295,13 +276,7 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
 
                       const SizedBox(height: 6),
 
-                      Text(
-                        'Rp5,200,000',
-
-                        style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text('Rp5,200,000', style: textTheme.headlineSmall),
                     ],
                   ),
                 ),
@@ -321,24 +296,16 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
                   ),
 
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade500),
-
+                    border: Border.all(color: colorScheme.outline),
                     borderRadius: BorderRadius.circular(12),
-
-                    color: Colors.white,
+                    color: colorScheme.surface,
                   ),
 
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Text(
-                        'Periode',
-
-                        style: textTheme.bodySmall?.copyWith(
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text('Periode', style: textTheme.bodySmall),
 
                       const SizedBox(height: 8),
 
@@ -395,24 +362,16 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
                   ),
 
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade500),
-
+                    border: Border.all(color: colorScheme.outline),
                     borderRadius: BorderRadius.circular(12),
-
-                    color: Colors.white,
+                    color: colorScheme.surface,
                   ),
 
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-                      Text(
-                        'Tujuan Alokasi',
-
-                        style: textTheme.bodySmall?.copyWith(
-                          color: Colors.black,
-                        ),
-                      ),
+                      Text('Tujuan Alokasi', style: textTheme.bodySmall),
 
                       DropdownButtonHideUnderline(
                         child: DropdownButton<String>(

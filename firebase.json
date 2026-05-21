@@ -1,0 +1,25 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "aturaja-app",
+          "appId": "1:960740040278:android:b3b1d69fdad40f21b125f7",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "aturaja-app",
+          "configurations": {
+            "android": "1:960740040278:android:b3b1d69fdad40f21b125f7",
+            "ios": "1:960740040278:ios:ceef7766f22a1ef8b125f7",
+            "macos": "1:960740040278:ios:ceef7766f22a1ef8b125f7",
+            "web": "1:960740040278:web:c731017c6641c7fab125f7",
+            "windows": "1:960740040278:web:8a421542b89dda63b125f7"
+          }
+        }
+      }
+    }
+  }
+}
