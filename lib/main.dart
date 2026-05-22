@@ -13,6 +13,10 @@ import 'ui/screens/topup/top_up_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
+import 'ui/screens/onboarding/onboarding_screen.dart';
+import 'ui/screens/auth/verify_identity_screen.dart';
+import 'ui/screens/auth/ktp_scanner_screen.dart';
+import 'ui/screens/auth/confirm_ktp_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,6 +58,7 @@ class MyApp extends StatelessWidget {
       
       routes: {
         '/splash': (context) => const SplashScreen(),
+        '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const App(),
@@ -61,6 +66,47 @@ class MyApp extends StatelessWidget {
         '/budgeting': (context) => const BudgetingScreen(),
         '/budgeting-new': (context) => const BudgetingNewScreen(),
         '/topup': (context) => const TopUpScreen(),
+        '/verify-otp': (context) {
+          final args = ModalRoute.of(context)?.settings.arguments as String? ?? '';
+          
+          return VerifyIdentityScreen(
+            phoneNumber: args,
+            onVerifySuccess: () {
+              Navigator.pushReplacementNamed(context, '/scan-ktp');
+            },
+            onBack: () {
+              Navigator.pop(context);
+            },
+          );
+        },
+        '/scan-ktp': (context) => KtpScannerScreen(
+      // 1. Ubah dari fungsi kosong () menjadi menerima parameter string path foto
+      onScanSuccess: (String capturedPath) {
+        Navigator.pushReplacementNamed(
+          context,
+          '/confirm-ktp',
+          // 2. Kirim path gambar ke rute berikutnya melalui properti arguments
+          arguments: capturedPath,
+        );
+      },
+      onBack: () => Navigator.pop(context),
+    ),
+      '/confirm-ktp': (context) {
+    // 3. Tangkap kiriman path gambar dari halaman kamera sebelumnya
+    final capturedImagePath = ModalRoute.of(context)?.settings.arguments as String? ?? '';
+    
+    return ConfirmKtpScreen(
+      imagePath: capturedImagePath,
+      onConfirm: () {
+        // 4. Jika OK, arahkan masuk ke Dashboard Home AturAja
+        Navigator.pushReplacementNamed(context, '/home');
+      },
+      onRetake: () {
+        // 5. Jika klik Foto Ulang, kembalikan ke layar kamera
+        Navigator.pushReplacementNamed(context, '/scan-ktp');
+      },
+    );
+  },
       },
     );
   }
