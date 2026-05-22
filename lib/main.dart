@@ -17,6 +17,9 @@ import 'ui/screens/onboarding/onboarding_screen.dart';
 import 'ui/screens/auth/verify_identity_screen.dart';
 import 'ui/screens/auth/ktp_scanner_screen.dart';
 import 'ui/screens/auth/confirm_ktp_screen.dart';
+import 'ui/screens/auth/face_scanner_screen.dart';
+import 'ui/screens/auth/confirm_selfie_screen.dart';
+import 'ui/screens/auth/data_personal_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,7 +58,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       initialRoute: '/splash',
-      
+
       routes: {
         '/splash': (context) => const SplashScreen(),
         '/onboarding': (context) => const OnboardingScreen(),
@@ -67,8 +70,9 @@ class MyApp extends StatelessWidget {
         '/budgeting-new': (context) => const BudgetingNewScreen(),
         '/topup': (context) => const TopUpScreen(),
         '/verify-otp': (context) {
-          final args = ModalRoute.of(context)?.settings.arguments as String? ?? '';
-          
+          final args =
+              ModalRoute.of(context)?.settings.arguments as String? ?? '';
+
           return VerifyIdentityScreen(
             phoneNumber: args,
             onVerifySuccess: () {
@@ -80,34 +84,63 @@ class MyApp extends StatelessWidget {
           );
         },
         '/scan-ktp': (context) => KtpScannerScreen(
-      // 1. Ubah dari fungsi kosong () menjadi menerima parameter string path foto
-      onScanSuccess: (String capturedPath) {
-        Navigator.pushReplacementNamed(
-          context,
-          '/confirm-ktp',
-          // 2. Kirim path gambar ke rute berikutnya melalui properti arguments
-          arguments: capturedPath,
-        );
-      },
-      onBack: () => Navigator.pop(context),
-    ),
-      '/confirm-ktp': (context) {
-    // 3. Tangkap kiriman path gambar dari halaman kamera sebelumnya
-    final capturedImagePath = ModalRoute.of(context)?.settings.arguments as String? ?? '';
-    
-    return ConfirmKtpScreen(
-      imagePath: capturedImagePath,
-      onConfirm: () {
-        // 4. Jika OK, arahkan masuk ke Dashboard Home AturAja
-        Navigator.pushReplacementNamed(context, '/home');
-      },
-      onRetake: () {
-        // 5. Jika klik Foto Ulang, kembalikan ke layar kamera
-        Navigator.pushReplacementNamed(context, '/scan-ktp');
-      },
+          // 1. Ubah dari fungsi kosong () menjadi menerima parameter string path foto
+          onScanSuccess: (String capturedPath) {
+            Navigator.pushReplacementNamed(
+              context,
+              '/confirm-ktp',
+              // 2. Kirim path gambar ke rute berikutnya melalui properti arguments
+              arguments: capturedPath,
+            );
+          },
+        ),
+        '/confirm-ktp': (context) {
+          // 3. Tangkap kiriman path gambar dari halaman kamera sebelumnya
+          final capturedImagePath =
+              ModalRoute.of(context)?.settings.arguments as String? ?? '';
+
+          return ConfirmKtpScreen(
+            imagePath: capturedImagePath,
+            onConfirm: () {
+              // 4. Jika OK, arahkan masuk ke Dashboard Home AturAja
+              Navigator.pushReplacementNamed(context, '/scan-face');
+            },
+            onRetake: () {
+              // 5. Jika klik Foto Ulang, kembalikan ke layar kamera
+              Navigator.pushReplacementNamed(context, '/scan-ktp');
+            },
+          );
+        },
+
+        '/scan-face': (context) => FaceScannerScreen(
+          onScanSuccess: (String capturedSelfiePath) {
+            Navigator.pushReplacementNamed(
+              context,
+              '/confirm-face',
+              arguments: capturedSelfiePath, // Lempar path foto Selfie
+            );
+          },
+        ),
+        '/confirm-face': (context) {
+          final String selfiePath = ModalRoute.of(context)?.settings.arguments as String? ?? '';
+
+          return ConfirmSelfieScreen(
+            imagePath: selfiePath,
+            onConfirm: () {
+              Navigator.pushReplacementNamed(context, '/data-personal'); // Alur sukses tamat, masuk home
+            },
+            onRetake: () {
+              Navigator.pushReplacementNamed(context, '/scan-face'); // Mengulang foto selfie kembali
+            },
+          );
+        },
+        '/data-personal': (context) => DataPersonalScreen(
+        onComplete: () {
+          // Jika data personal selesai diisi, arahkan ke Home
+          Navigator.pushReplacementNamed(context, '/home');
+        },
+      ),
+      }
     );
-  },
-      },
-    );
+    }
   }
-}
