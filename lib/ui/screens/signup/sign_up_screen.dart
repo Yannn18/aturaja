@@ -110,7 +110,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onPressed: () {
                       // Cek apakah inputan valid sebelum diproses
                       if (_formKey.currentState!.validate()) {
-                        // TODO: Tambahkan logika Firebase Authentication di sini
+                        // Mengambil teks nomor ponsel yang diinput oleh user
+                        String inputPhoneNumber = _phoneController.text;
+
+                        // Navigasi langsung ke halaman OTP dengan melempar data nomor HP
+                        Navigator.pushNamed(
+                          context,
+                          '/verify-otp',
+                          arguments: inputPhoneNumber,
+                        );
+
+                        // Jalur cetak log untuk debugging lokal (tetap dipertahankan)
                         print("Phone: ${_phoneController.text}");
                         print("Password: ${_passwordController.text}");
                       }
