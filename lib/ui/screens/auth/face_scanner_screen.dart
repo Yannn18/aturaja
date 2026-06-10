@@ -60,7 +60,7 @@ class _FaceScannerScreenState extends State<FaceScannerScreen> {
     }
     _cameraController = CameraController(
       _cameras![_selectedCameraIndex],
-      ResolutionPreset.high,
+      ResolutionPreset.medium,
       enableAudio: false,
     );
     try {

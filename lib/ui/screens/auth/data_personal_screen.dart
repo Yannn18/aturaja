@@ -107,6 +107,7 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
 
     try {
       final AuthRepository authRepo = AuthRepository();
+      print("KTP FILE: ${completeModel.ktpImagePath}");
       await authRepo.registerCompleteUser(completeModel);
 
       if (mounted) Navigator.of(context, rootNavigator: true).pop();

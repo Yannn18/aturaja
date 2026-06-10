@@ -260,11 +260,26 @@ class _ConfirmSelfieScreenState extends State<ConfirmSelfieScreen> {
                                 height: 52,
                                 child: ElevatedButton(
                                   onPressed: () {
+                                    final updatedModel = _registrationModel
+                                        .copyWith(
+                                          selfieImagePath:
+                                              _imagePath, // Mengunci path selfie lokal
+                                        );
+
+                                    print(
+                                      '✓ Koper Data Siap Meluncur ke Final Form!',
+                                    );
+                                    print(
+                                      '  - KTP Path: ${updatedModel.ktpImagePath}',
+                                    );
+                                    print(
+                                      '  - Selfie Path: ${updatedModel.selfieImagePath}',
+                                    );
                                     // Bawa koper data lanjut ke form final Data Personal
                                     Navigator.pushReplacementNamed(
                                       context,
                                       '/data-personal',
-                                      arguments: _registrationModel,
+                                      arguments: updatedModel,
                                     );
                                   },
                                   style: ElevatedButton.styleFrom(

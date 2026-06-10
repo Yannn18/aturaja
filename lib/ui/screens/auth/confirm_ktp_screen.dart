@@ -35,7 +35,11 @@ class _ConfirmKtpScreenState extends State<ConfirmKtpScreen> {
   // Aksi jika tombol "Gunakan Foto" ditekan
   void _handleConfirm() {
     // Lanjut ke Face Scanner dengan membawa koper data yang sama
-    Navigator.pushNamed(context, '/scan-face', arguments: _registrationModel);
+    final updatedModel = _registrationModel.copyWith(
+      ktpImagePath: _imagePath, // <--- KUNCI ALAMAT GAMBAR DI SINI!
+    );
+    print('✓ Koper Data Mengunci Foto KTP: ${updatedModel.ktpImagePath}');
+    Navigator.pushNamed(context, '/scan-face', arguments: updatedModel);
   }
 
   // Aksi jika tombol "Foto Ulang" ditekan

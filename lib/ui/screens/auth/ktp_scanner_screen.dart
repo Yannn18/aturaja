@@ -34,7 +34,8 @@ class _KtpScannerScreenState extends State<KtpScannerScreen> {
     try {
       final XFile? photo = await _picker.pickImage(
         source: ImageSource.camera,
-        imageQuality: 80, // Kompresi agar upload ke Firebase lebih cepat
+        imageQuality: 25,
+        maxWidth: 800, // Kompresi agar upload ke Firebase lebih cepat
         preferredCameraDevice: CameraDevice.rear, // Gunakan kamera belakang
       );
 
