@@ -1,22 +1,63 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+// TODO: Pastikan path import ini sesuai dengan struktur folder Anda
+import 'package:aturaja/data/models/registration_data_model.dart';
 
-class ConfirmKtpScreen extends StatelessWidget {
-  final String imagePath;
-  final VoidCallback onConfirm;
-  final VoidCallback onRetake;
+class ConfirmKtpScreen extends StatefulWidget {
+  // BERSIH: Tidak ada parameter yang diminta dari luar!
+  const ConfirmKtpScreen({super.key});
 
-  const ConfirmKtpScreen({
-    Key? key,
-    required this.imagePath,
-    required this.onConfirm,
-    required this.onRetake,
-  }) : super(key: key);
+  @override
+  State<ConfirmKtpScreen> createState() => _ConfirmKtpScreenState();
+}
+
+class _ConfirmKtpScreenState extends State<ConfirmKtpScreen> {
+  late RegistrationDataModel _registrationModel;
+  bool _modelLoaded = false;
+  String _imagePath = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Menangkap "Koper Data" dari layar sebelumnya
+    if (!_modelLoaded) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is RegistrationDataModel) {
+        _registrationModel = args;
+        _imagePath = _registrationModel
+            .ktpImagePath; // Ambil path foto KTP dari dalam model
+        _modelLoaded = true;
+      }
+    }
+  }
+
+  // Aksi jika tombol "Gunakan Foto" ditekan
+  void _handleConfirm() {
+    // Lanjut ke Face Scanner dengan membawa koper data yang sama
+    Navigator.pushNamed(context, '/scan-face', arguments: _registrationModel);
+  }
+
+  // Aksi jika tombol "Foto Ulang" ditekan
+  void _handleRetake() {
+    // Kembali ke halaman KTP Scanner (menghapus halaman konfirmasi ini dari stack)
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Memeriksa keberadaan file foto hasil tangkapan kamera
-    final bool hasValidImage = imagePath.isNotEmpty && File(imagePath).existsSync();
+    // Error handling jika halaman dibuka tanpa membawa data
+    if (!_modelLoaded) {
+      return const Scaffold(
+        body: Center(
+          child: Text("Data registrasi tidak ditemukan. Gagal memuat foto."),
+        ),
+      );
+    }
+
+    // Memeriksa keberadaan file foto hasil tangkapan kamera dari model
+    final bool hasValidImage =
+        _imagePath.isNotEmpty && File(_imagePath).existsSync();
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAFAFA),
@@ -39,7 +80,7 @@ class ConfirmKtpScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 "Pastikan seluruh bagian KTP berada di dalam kotak,\ndata terbaca jelas, dan tidak ada pantulan cahaya.",
                 style: TextStyle(
                   fontSize: 13,
@@ -51,7 +92,7 @@ class ConfirmKtpScreen extends StatelessWidget {
 
               const SizedBox(height: 28),
 
-              // 2. MAIN KTP FRAME SLOT (MURNI MENAMPILKAN HASIL JEP RETAN KAMERA)
+              // 2. MAIN KTP FRAME SLOT
               Center(
                 child: AspectRatio(
                   aspectRatio: 1.58,
@@ -68,27 +109,30 @@ class ConfirmKtpScreen extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
-                        color: Colors.grey, // Background putih netral samar jika foto belum termuat
+                        color: Colors.grey,
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            // LANGSUNG TAMPILKAN FOTO HASIL TANGKAPAN KAMERA
                             if (hasValidImage)
-                              Image.file(
-                                File(imagePath),
-                                fit: BoxFit.cover,
-                              )
+                              Image.file(File(_imagePath), fit: BoxFit.cover)
                             else
-                              // Jika gambar belum lolos, tampilkan placeholder minimalis berwarna netral (bukan biru)
-                              Center(
+                              const Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.photo_camera_outlined, size: 40, color: Colors.grey),
-                                    const SizedBox(height: 8),
+                                    Icon(
+                                      Icons.photo_camera_outlined,
+                                      size: 40,
+                                      color: Colors.grey,
+                                    ),
+                                    SizedBox(height: 8),
                                     Text(
                                       "Memuat gambar...",
-                                      style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -120,25 +164,37 @@ class ConfirmKtpScreen extends StatelessWidget {
                         color: Color(0xFFFFF1F2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.visibility, color: Color(0xFFD31111), size: 18),
+                      child: const Icon(
+                        Icons.visibility,
+                        color: Color(0xFFD31111),
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 14),
-                    Expanded(
+                    const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             "Apakah foto sudah jelas?",
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF111827),
+                            ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             "Data harus terbaca tanpa buram atau silau.",
-                            style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -151,17 +207,28 @@ class ConfirmKtpScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFFF9FAFB),
                   borderRadius: BorderRadius.circular(24.0),
-                  border: Border.all(color: const Color(0xFFE5E7EB).withOpacity(0.5)),
+                  border: Border.all(
+                    color: const Color(0xFFE5E7EB).withOpacity(0.5),
+                  ),
                 ),
                 child: Column(
                   children: [
-                    Row(
+                    const Row(
                       children: [
-                        Icon(Icons.lightbulb_outline, color: Colors.grey, size: 16),
-                        const SizedBox(width: 8),
-                        const Text(
+                        Icon(
+                          Icons.lightbulb_outline,
+                          color: Colors.grey,
+                          size: 16,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
                           "TIPS KUALITAS FOTO",
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 1),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF6B7280),
+                            letterSpacing: 1,
+                          ),
                         ),
                       ],
                     ),
@@ -177,30 +244,35 @@ class ConfirmKtpScreen extends StatelessWidget {
 
               const SizedBox(height: 28),
 
-              // 5. FOOTER BUTTON ACTION ROW (SUDAH FIX ANTI OVERFLOW KANAN)
+              // 5. FOOTER BUTTON ACTION ROW
               Row(
                 children: [
-                  // BUTTON LEFT: RETAKE FOTO
                   Expanded(
                     child: SizedBox(
                       height: 50,
                       child: OutlinedButton(
-                        onPressed: onRetake,
+                        onPressed: _handleRetake, // Memanggil fungsi Retake
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Color(0xFFE5E7EB)),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                           backgroundColor: Colors.white,
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.refresh, size: 14, color: Colors.grey),
-                            const SizedBox(width: 6),
-                            const Flexible(
+                            SizedBox(width: 6),
+                            Flexible(
                               child: Text(
                                 "Foto Ulang",
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1F2937),
+                                ),
                               ),
                             ),
                           ],
@@ -209,17 +281,17 @@ class ConfirmKtpScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  
-                  // BUTTON RIGHT: CONFIRM FOTO (DIAMANKAN DENGAN FLEXIBLE AGAR TIDAK MELEBAR)
                   Expanded(
                     child: SizedBox(
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: onConfirm,
+                        onPressed: _handleConfirm, // Memanggil fungsi Confirm
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFD31111),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                           elevation: 0,
                         ),
                         child: const Row(
@@ -231,7 +303,10 @@ class ConfirmKtpScreen extends StatelessWidget {
                               child: Text(
                                 "Gunakan Foto",
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -261,13 +336,19 @@ class ConfirmKtpScreen extends StatelessWidget {
             border: Border.all(color: const Color(0xFFFEE2E2)),
             shape: BoxShape.circle,
           ),
-          child: const Center(child: Icon(Icons.check, size: 10, color: Color(0xFFD31111))),
+          child: const Center(
+            child: Icon(Icons.check, size: 10, color: Color(0xFFD31111)),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             tipText,
-            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF374151)),
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF374151),
+            ),
           ),
         ),
       ],
