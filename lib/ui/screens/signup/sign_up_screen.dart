@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:aturaja/data/models/registration_data_model.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -110,14 +112,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onPressed: () {
                       // Cek apakah inputan valid sebelum diproses
                       if (_formKey.currentState!.validate()) {
-                        // Mengambil teks nomor ponsel yang diinput oleh user
-                        String inputPhoneNumber = _phoneController.text;
+                        // Instantiate RegistrationDataModel dengan phone dan password
+                        final registrationModel = RegistrationDataModel(
+                          phone: _phoneController.text,
+                          password: _passwordController.text,
+                          fullName: '', // Will be filled in DataPersonalScreen
+                          email: '', // Will be filled in DataPersonalScreen
+                          ktpImagePath:
+                              '', // Will be filled in KtpScannerScreen
+                          selfieImagePath:
+                              '', // Will be filled in FaceScannerScreen
+                        );
 
-                        // Navigasi langsung ke halaman OTP dengan melempar data nomor HP
+                        // Navigasi ke OTP screen dengan melempar RegistrationDataModel
+                        // OTP screen akan memvalidasi OTP dan pass model forward ke DataPersonalScreen
                         Navigator.pushNamed(
                           context,
                           '/verify-otp',
-                          arguments: inputPhoneNumber,
+                          arguments: registrationModel,
                         );
 
                         // Jalur cetak log untuk debugging lokal (tetap dipertahankan)
