@@ -69,78 +69,19 @@ class MyApp extends StatelessWidget {
         '/budgeting': (context) => const BudgetingScreen(),
         '/budgeting-new': (context) => const BudgetingNewScreen(),
         '/topup': (context) => const TopUpScreen(),
-        '/verify-otp': (context) {
-          final args =
-              ModalRoute.of(context)?.settings.arguments as String? ?? '';
 
-          return VerifyIdentityScreen(
-            phoneNumber: args,
-            onVerifySuccess: () {
-              Navigator.pushReplacementNamed(context, '/scan-ktp');
-            },
-            onBack: () {
-              Navigator.pop(context);
-            },
-          );
-        },
-        '/scan-ktp': (context) => KtpScannerScreen(
-          // 1. Ubah dari fungsi kosong () menjadi menerima parameter string path foto
-          onScanSuccess: (String capturedPath) {
-            Navigator.pushReplacementNamed(
-              context,
-              '/confirm-ktp',
-              // 2. Kirim path gambar ke rute berikutnya melalui properti arguments
-              arguments: capturedPath,
-            );
-          },
-        ),
-        '/confirm-ktp': (context) {
-          // 3. Tangkap kiriman path gambar dari halaman kamera sebelumnya
-          final capturedImagePath =
-              ModalRoute.of(context)?.settings.arguments as String? ?? '';
-
-          return ConfirmKtpScreen(
-            imagePath: capturedImagePath,
-            onConfirm: () {
-              // 4. Jika OK, arahkan masuk ke Dashboard Home AturAja
-              Navigator.pushReplacementNamed(context, '/scan-face');
-            },
-            onRetake: () {
-              // 5. Jika klik Foto Ulang, kembalikan ke layar kamera
-              Navigator.pushReplacementNamed(context, '/scan-ktp');
-            },
-          );
-        },
-
-        '/scan-face': (context) => FaceScannerScreen(
-          onScanSuccess: (String capturedSelfiePath) {
-            Navigator.pushReplacementNamed(
-              context,
-              '/confirm-face',
-              arguments: capturedSelfiePath, // Lempar path foto Selfie
-            );
-          },
-        ),
-        '/confirm-face': (context) {
-          final String selfiePath = ModalRoute.of(context)?.settings.arguments as String? ?? '';
-
-          return ConfirmSelfieScreen(
-            imagePath: selfiePath,
-            onConfirm: () {
-              Navigator.pushReplacementNamed(context, '/data-personal'); // Alur sukses tamat, masuk home
-            },
-            onRetake: () {
-              Navigator.pushReplacementNamed(context, '/scan-face'); // Mengulang foto selfie kembali
-            },
-          );
-        },
-        '/data-personal': (context) => DataPersonalScreen(
-        onComplete: () {
-          // Jika data personal selesai diisi, arahkan ke Home
-          Navigator.pushReplacementNamed(context, '/home');
-        },
-      ),
-      }
+        // =========================================================
+        // ALUR KYC (KNOW YOUR CUSTOMER) REGISTRATION
+        // Rute dibuat bersih. Pelemparan data (Model)
+        // dilakukan secara internal di masing-masing file screen.
+        // =========================================================
+        '/verify-otp': (context) => const VerifyIdentityScreen(),
+        '/scan-ktp': (context) => const KtpScannerScreen(),
+        '/confirm-ktp': (context) => const ConfirmKtpScreen(),
+        '/scan-face': (context) => const FaceScannerScreen(),
+        '/confirm-face': (context) => const ConfirmSelfieScreen(),
+        '/data-personal': (context) => const DataPersonalScreen(),
+      },
     );
-    }
   }
+}
