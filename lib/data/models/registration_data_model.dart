@@ -12,19 +12,31 @@ class RegistrationDataModel {
   /// User's email (from DataPersonalScreen)
   final String email;
 
+  /// User's NIK identity number (from DataPersonalScreen)
+  final String nik;
+
+  /// User's full address (from DataPersonalScreen)
+  final String alamat;
+
   /// Local file path to KTP image (from KtpScannerScreen)
   final String ktpImagePath;
 
   /// Local file path to selfie image (from FaceScannerScreen)
   final String selfieImagePath;
 
+  // ===========================================================================
+  // CONSTRUCTOR: Diubah menjadi opsional dengan nilai default '' (String Kosong)
+  // agar halaman SignUp tidak error saat baru membuat koper data ini.
+  // ===========================================================================
   RegistrationDataModel({
     required this.phone,
     required this.password,
-    required this.fullName,
-    required this.email,
-    required this.ktpImagePath,
-    required this.selfieImagePath,
+    this.fullName = '',
+    this.email = '',
+    this.nik = '',
+    this.alamat = '',
+    this.ktpImagePath = '',
+    this.selfieImagePath = '',
   });
 
   /// Convert model to JSON (excludes password for security)
@@ -34,6 +46,8 @@ class RegistrationDataModel {
       'phone': phone,
       'fullName': fullName,
       'email': email,
+      'nik': nik,
+      'alamat': alamat,
       'ktpImagePath': ktpImagePath,
       'selfieImagePath': selfieImagePath,
     };
@@ -42,12 +56,14 @@ class RegistrationDataModel {
   /// Create RegistrationDataModel from JSON
   factory RegistrationDataModel.fromJson(Map<String, dynamic> json) {
     return RegistrationDataModel(
-      phone: json['phone'] as String,
+      phone: json['phone'] as String? ?? '',
       password: json['password'] as String? ?? '',
-      fullName: json['fullName'] as String,
-      email: json['email'] as String,
-      ktpImagePath: json['ktpImagePath'] as String,
-      selfieImagePath: json['selfieImagePath'] as String,
+      fullName: json['fullName'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      nik: json['nik'] as String? ?? '',
+      alamat: json['alamat'] as String? ?? '',
+      ktpImagePath: json['ktpImagePath'] as String? ?? '',
+      selfieImagePath: json['selfieImagePath'] as String? ?? '',
     );
   }
 
@@ -57,6 +73,8 @@ class RegistrationDataModel {
     String? password,
     String? fullName,
     String? email,
+    String? nik,
+    String? alamat,
     String? ktpImagePath,
     String? selfieImagePath,
   }) {
@@ -65,6 +83,8 @@ class RegistrationDataModel {
       password: password ?? this.password,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
+      nik: nik ?? this.nik,
+      alamat: alamat ?? this.alamat,
       ktpImagePath: ktpImagePath ?? this.ktpImagePath,
       selfieImagePath: selfieImagePath ?? this.selfieImagePath,
     );
@@ -76,6 +96,8 @@ class RegistrationDataModel {
         'phone: $phone, '
         'fullName: $fullName, '
         'email: $email, '
+        'nik: $nik, '
+        'alamat: $alamat, '
         'ktpImagePath: $ktpImagePath, '
         'selfieImagePath: $selfieImagePath'
         ')';

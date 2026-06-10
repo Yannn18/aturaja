@@ -1,22 +1,45 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:aturaja/data/models/registration_data_model.dart'; // Sesuaikan path
 
-class ConfirmSelfieScreen extends StatelessWidget {
-  final String imagePath;
-  final VoidCallback onConfirm;
-  final VoidCallback onRetake;
+class ConfirmSelfieScreen extends StatefulWidget {
+  const ConfirmSelfieScreen({Key? key}) : super(key: key);
 
-  const ConfirmSelfieScreen({
-    Key? key,
-    required this.imagePath,
-    required this.onConfirm,
-    required this.onRetake,
-  }) : super(key: key);
+  @override
+  State<ConfirmSelfieScreen> createState() => _ConfirmSelfieScreenState();
+}
+
+class _ConfirmSelfieScreenState extends State<ConfirmSelfieScreen> {
+  late RegistrationDataModel _registrationModel;
+  bool _modelLoaded = false;
+  String _imagePath = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_modelLoaded) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is RegistrationDataModel) {
+        _registrationModel = args;
+        _imagePath = _registrationModel.selfieImagePath;
+        _modelLoaded = true;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!_modelLoaded) {
+      return const Scaffold(
+        body: Center(child: Text("Data registrasi gagal dimuat.")),
+      );
+    }
+
+    final bool hasValidImage =
+        _imagePath.isNotEmpty && File(_imagePath).existsSync();
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF9F9), // Warna netral bg-neutral-50/50
+      backgroundColor: const Color(0xFFFAF9F9),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -25,11 +48,13 @@ class ConfirmSelfieScreen extends StatelessWidget {
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 24.0,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // ================= TOP HEADER SECTION =================
                         const SizedBox(height: 8),
                         const Text(
                           "Apakah Selfie Sudah Jelas?",
@@ -52,20 +77,24 @@ class ConfirmSelfieScreen extends StatelessWidget {
                           ),
                         ),
 
-                        // ================= MAIN SELFIE DISPLAY SLOT =================
                         Expanded(
                           child: Center(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 20.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 20.0,
+                              ),
                               child: Container(
-                                constraints: const BoxConstraints(maxWidth: 360),
+                                constraints: const BoxConstraints(
+                                  maxWidth: 360,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFFF1F2).withOpacity(0.15), // bg-rose-50/15
+                                  color: const Color(
+                                    0xFFFFF1F2,
+                                  ).withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(28),
                                   border: Border.all(
-                                    color: const Color(0xFFFECDD3), // border-rose-200
+                                    color: const Color(0xFFFECDD3),
                                     width: 2.5,
-                                    style: BorderStyle.solid, // Representasi visual dash
                                   ),
                                 ),
                                 padding: const EdgeInsets.all(10.0),
@@ -75,9 +104,9 @@ class ConfirmSelfieScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(20),
                                     child: Container(
                                       color: const Color(0xFFF5F5F5),
-                                      child: imagePath.isNotEmpty && File(imagePath).existsSync()
+                                      child: hasValidImage
                                           ? Image.file(
-                                              File(imagePath),
+                                              File(_imagePath),
                                               fit: BoxFit.cover,
                                               alignment: Alignment.center,
                                             )
@@ -90,7 +119,6 @@ class ConfirmSelfieScreen extends StatelessWidget {
                           ),
                         ),
 
-                        // ================= VERIFICATION PROMPT CARD BAR =================
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(16.0),
@@ -98,20 +126,17 @@ class ConfirmSelfieScreen extends StatelessWidget {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(color: const Color(0xFFF5F5F5)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.04),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              )
-                            ],
                           ),
                           child: const Row(
                             children: [
                               CircleAvatar(
                                 radius: 24,
-                                backgroundColor: Color(0xFFFFF1F2), // bg-rose-50
-                                child: Icon(Icons.visibility_outlined, color: Color(0xFFD31111), size: 20),
+                                backgroundColor: Color(0xFFFFF1F2),
+                                child: Icon(
+                                  Icons.visibility_outlined,
+                                  color: Color(0xFFD31111),
+                                  size: 20,
+                                ),
                               ),
                               SizedBox(width: 16),
                               Expanded(
@@ -137,28 +162,33 @@ class ConfirmSelfieScreen extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 16),
 
-                        // ================= CUSTOM MATCHING TIPS SECTION =================
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(20.0),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF9F9F9),
                             borderRadius: BorderRadius.circular(28),
-                            border: Border.all(color: const Color(0xFFE5E5E5).withOpacity(0.5)),
+                            border: Border.all(
+                              color: const Color(0xFFE5E5E5).withOpacity(0.5),
+                            ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
+                              const Row(
                                 children: [
-                                  Icon(Icons.lightbulb_outline, color: Colors.grey, size: 16),
-                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.lightbulb_outline,
+                                    color: Colors.grey,
+                                    size: 16,
+                                  ),
+                                  SizedBox(width: 8),
                                   Text(
                                     "TIPS KUALITAS FOTO",
                                     style: TextStyle(
@@ -173,45 +203,50 @@ class ConfirmSelfieScreen extends StatelessWidget {
                               const SizedBox(height: 16),
                               _buildTipRow("Pencahayaan cukup dan merata"),
                               const SizedBox(height: 12),
-                              _buildTipRow("Wajah tidak terpotong (masuk dalam frame)"),
+                              _buildTipRow(
+                                "Wajah tidak terpotong (masuk dalam frame)",
+                              ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 20),
 
-                        // ================= DOUBLE INTERACTIVE ACTIONS FOOTER =================
-// ================= DOUBLE INTERACTIVE ACTIONS FOOTER =================
                         Row(
                           children: [
-                            // Button Retake (Foto Ulang)
                             Expanded(
                               child: SizedBox(
                                 height: 52,
                                 child: OutlinedButton(
-                                  onPressed: onRetake,
+                                  onPressed: () => Navigator.pop(
+                                    context,
+                                  ), // Mengulang foto selfie kembali
                                   style: OutlinedButton.styleFrom(
                                     backgroundColor: Colors.white,
-                                    side: const BorderSide(color: Color(0xFFE5E5E5)),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4), // Mencegah padding dalam terlalu ketat
-                                    elevation: 0,
+                                    side: const BorderSide(
+                                      color: Color(0xFFE5E5E5),
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
                                   ),
-                                  child: Row(
+                                  child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min, // Mengunci ukuran seminimal mungkin
                                     children: [
-                                      Icon(Icons.refresh_rounded, size: 16, color: Colors.grey),
-                                      const SizedBox(width: 4),
-                                      const Flexible(
-                                        child: Text(
-                                          "Foto Ulang",
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis, // Jika mentok, otomatis jadi "Foto..."
-                                          style: TextStyle(
-                                            fontSize: 13, // Diturunkan sedikit dari 14 agar lebih aman di layar kecil
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF424242),
-                                          ),
+                                      Icon(
+                                        Icons.refresh_rounded,
+                                        size: 16,
+                                        color: Colors.grey,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "Foto Ulang",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF424242),
                                         ),
                                       ),
                                     ],
@@ -219,37 +254,40 @@ class ConfirmSelfieScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12), // Dipersempit sedikit dari 16 agar ruang tombol lebih luas
-                            
-                            // Button Confirm (Gunakan Foto) - SOLUSI UTAMA OVERFLOW
+                            const SizedBox(width: 12),
                             Expanded(
                               child: SizedBox(
                                 height: 52,
                                 child: ElevatedButton(
-                                  onPressed: onConfirm,
+                                  onPressed: () {
+                                    // Bawa koper data lanjut ke form final Data Personal
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/scan-face',
+                                      arguments: _registrationModel,
+                                    );
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFFD31111),
                                     foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4), // Longgarkan area dalam tombol
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
                                     elevation: 3,
-                                    shadowColor: const Color(0xFFD31111).withOpacity(0.2),
                                   ),
                                   child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(Icons.check_rounded, size: 16, color: Colors.white),
-                                      const SizedBox(width: 4),
-                                      Flexible( // Ditambahkan agar teks mengalah mengikuti batas sisa ruang tombol
-                                        child: Text(
-                                          "Gunakan Foto",
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis, // Potong teks dengan titik tiga jika benar-benar tidak muat
-                                          style: TextStyle(
-                                            fontSize: 13, // Dioptimalkan menjadi 13 agar pas berdampingan dengan ikon
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                      Icon(Icons.check_rounded, size: 16),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "Gunakan Foto",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],

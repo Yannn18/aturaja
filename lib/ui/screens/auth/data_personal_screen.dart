@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:aturaja/data/models/registration_data_model.dart'; // Sesuaikan path
+import 'package:aturaja/data/repositories/auth_repository.dart'; // Pastikan file AuthRepository Fase 1 sudah ada
 
 class DataPersonalScreen extends StatefulWidget {
-  final VoidCallback onComplete;
-
-  const DataPersonalScreen({
-    Key? key,
-    required this.onComplete,
-  }) : super(key: key);
+  const DataPersonalScreen({Key? key}) : super(key: key);
 
   @override
   State<DataPersonalScreen> createState() => _DataPersonalScreenState();
@@ -19,23 +16,36 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
   final _namaController = TextEditingController();
   final _alamatController = TextEditingController();
 
-  // Variabel penampung pesan error untuk kustomisasi UI manual
   String? _nikError;
   String? _namaError;
   String? _alamatError;
 
-  void _handleSubmit() {
+  late RegistrationDataModel _registrationModel;
+  bool _modelLoaded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_modelLoaded) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is RegistrationDataModel) {
+        _registrationModel = args;
+        _modelLoaded = true;
+      }
+    }
+  }
+
+  // EKSEKUSI PENDAFTARAN MASAL KE FIREBASE CLOUD
+  Future<void> _handleSubmit() async {
     setState(() {
-      // Reset error di awal validasi
       _nikError = null;
       _namaError = null;
       _alamatError = null;
     });
 
     bool isValid = true;
-
-    // 1. Validasi Aturan NIK
     String nik = _nikController.text.trim();
+
     if (nik.isEmpty) {
       _nikError = 'NIK wajib diisi';
       isValid = false;
@@ -44,25 +54,72 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
       isValid = false;
     }
 
-    // 2. Validasi Aturan Nama
     if (_namaController.text.trim().isEmpty) {
       _namaError = 'Nama lengkap wajib diisi';
       isValid = false;
     }
 
-    // 3. Validasi Aturan Alamat
     if (_alamatController.text.trim().isEmpty) {
       _alamatError = 'Alamat lengkap wajib diisi';
       isValid = false;
     }
 
-    if (!isValid) {
-      setState(() {}); // Segarkan UI untuk menampilkan pesan error kustom
+    if (!isValid || !_modelLoaded) {
+      setState(() {});
       return;
     }
 
-    // Jika seluruh form lolos verifikasi, eksekusi rute sukses keluar
-    widget.onComplete();
+    // 1. Munculkan Dialog Loading Kunci Layar agar aman dari Interupsi ketukan jari user
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD31111)),
+        ),
+      ),
+    );
+
+    // 2. Isi data personal terakhir ke dalam Koper Data
+    final completeModel = _registrationModel.copyWith(
+      nik: _nikController.text.trim(),
+      fullName: _namaController.text.trim(),
+      alamat: _alamatController.text.trim(),
+    );
+
+    try {
+      // 3. Panggil Repositori Fase 1 untuk mengunggah aset gambar & mendaftarkan profile cloud
+      final AuthRepository authRepo = AuthRepository();
+      await authRepo.registerCompleteUser(completeModel);
+
+      // 4. Tutup loading dialog jika proses sukses mendarat
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+
+      // 5. Tampilkan Pesan Sukses KYC Berhasil
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registrasi Akun KYC Sukses Berhasil!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Bersihkan stack dan hantarkan masuk ke Dashboard Utama Home AturAja
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      }
+    } catch (e) {
+      // 6. Matikan loading dialog jika tersandung gangguan jaringan internet/aturan rules
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pendaftaran gagal: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -75,11 +132,16 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_modelLoaded) {
+      return const Scaffold(
+        body: Center(child: Text("Sesi data pendaftaran kedaluwarsa.")),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF9F9), // bg-[#FAF9F9]
+      backgroundColor: const Color(0xFFFAF9F9),
       body: Stack(
         children: [
-          // CORE VIEWPORT LAYOUT (SCROLLABLE AREA)
           Positioned.fill(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -87,14 +149,13 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                 top: 64,
                 left: 24,
                 right: 24,
-                bottom: 120, // Padding ekstra di bawah agar konten form tidak tertutup footer
+                bottom: 120,
               ),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ================= HEADER TITLES =================
                     const Text(
                       "REGISTRASI PROFIL",
                       style: TextStyle(
@@ -127,14 +188,15 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // ================= KEAMANAN TERJAMIN CARD =================
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(20.0),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFF5F5), // bg-[#FFF5F5]
+                        color: const Color(0xFFFFF5F5),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: const Color(0xFFFFE4E6).withOpacity(0.5)),
+                        border: Border.all(
+                          color: const Color(0xFFFFE4E6).withOpacity(0.5),
+                        ),
                       ),
                       child: const Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,7 +204,11 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                           CircleAvatar(
                             radius: 20,
                             backgroundColor: Color(0xFFFFF1F2),
-                            child: Icon(Icons.shield_outlined, color: Color(0xFFD31111), size: 22),
+                            child: Icon(
+                              Icons.shield_outlined,
+                              color: Color(0xFFD31111),
+                              size: 22,
+                            ),
                           ),
                           SizedBox(width: 16),
                           Expanded(
@@ -169,13 +235,12 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                                 ),
                               ],
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
 
-                    // ================= WHITE PANEL FORM FIELDS =================
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(24.0),
@@ -183,18 +248,10 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(28),
                         border: Border.all(color: const Color(0xFFF5F5F5)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.015),
-                            blurRadius: 24,
-                            offset: const Offset(0, 4),
-                          )
-                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // INPUT FIELD: NIK
                           _buildInputLabel("NIK (NOMOR INDUK KEPENDUDUKAN)"),
                           const SizedBox(height: 8),
                           _buildTextFieldContainer(
@@ -204,11 +261,20 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                               controller: _nikController,
                               keyboardType: TextInputType.number,
                               maxLength: 16,
-                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                              decoration: _buildInputDecoration("16 Digit No. KTP"),
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF262626)),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              decoration: _buildInputDecoration(
+                                "16 Digit No. KTP",
+                              ),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF262626),
+                              ),
                               onChanged: (val) {
-                                if (_nikError != null) setState(() => _nikError = null);
+                                if (_nikError != null)
+                                  setState(() => _nikError = null);
                               },
                             ),
                           ),
@@ -216,7 +282,6 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
 
                           const SizedBox(height: 20),
 
-                          // INPUT FIELD: NAMA LENGKAP
                           _buildInputLabel("NAMA LENGKAP"),
                           const SizedBox(height: 8),
                           _buildTextFieldContainer(
@@ -226,39 +291,56 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                               controller: _namaController,
                               keyboardType: TextInputType.name,
                               decoration: _buildInputDecoration("Nama Lengkap"),
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF262626)),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF262626),
+                              ),
                               onChanged: (val) {
-                                if (_namaError != null) setState(() => _namaError = null);
+                                if (_namaError != null)
+                                  setState(() => _namaError = null);
                               },
                             ),
                           ),
-                          if (_namaError != null) _buildErrorMessage(_namaError!),
+                          if (_namaError != null)
+                            _buildErrorMessage(_namaError!),
 
                           const SizedBox(height: 20),
 
-                          // INPUT FIELD: ALAMAT LENGKAP
                           _buildInputLabel("ALAMAT LENGKAP"),
                           const SizedBox(height: 8),
                           _buildTextFieldContainer(
                             icon: Icons.home_outlined,
                             isError: _alamatError != null,
                             alignment: Alignment.topLeft,
-                            padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 4),
+                            padding: const EdgeInsets.only(
+                              left: 16,
+                              right: 16,
+                              top: 12,
+                              bottom: 4,
+                            ),
                             child: TextFormField(
                               controller: _alamatController,
                               maxLines: 3,
-                              decoration: _buildInputDecoration("Jl. Raya, No. Rumah, RT/RW, Kelurahan/Kecamatan"),
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF262626)),
+                              decoration: _buildInputDecoration(
+                                "Jl. Raya, No. Rumah, RT/RW, Kelurahan/Kecamatan",
+                              ),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF262626),
+                              ),
                               onChanged: (val) {
-                                if (_alamatError != null) setState(() => _alamatError = null);
+                                if (_alamatError != null)
+                                  setState(() => _alamatError = null);
                               },
                             ),
                           ),
-                          if (_alamatError != null) _buildErrorMessage(_alamatError!),
+                          if (_alamatError != null)
+                            _buildErrorMessage(_alamatError!),
 
                           const SizedBox(height: 28),
 
-                          // BUTTON SUBMIT (SELESAI)
                           SizedBox(
                             width: double.infinity,
                             height: 54,
@@ -267,13 +349,17 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFFD31111),
                                 foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
                                 elevation: 4,
-                                shadowColor: const Color(0xFFD31111).withOpacity(0.2),
                               ),
                               child: const Text(
                                 "Selesai",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
@@ -286,7 +372,6 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
             ),
           ),
 
-          // ================= FIXED BOTTOM FOOTER PANEL =================
           Positioned(
             left: 0,
             right: 0,
@@ -295,13 +380,6 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.95),
                 border: const Border(top: BorderSide(color: Color(0xFFF5F5F5))),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 20,
-                    offset: const Offset(0, -6),
-                  )
-                ],
               ),
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
               child: SafeArea(
@@ -309,17 +387,16 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    // Help action tab
                     _buildFooterButton(
                       icon: Icons.help_outline_rounded,
                       label: "BANTUAN",
                       onTap: () {},
                     ),
-                    
-                    // Vertical divider line
-                    Container(width: 1.5, height: 32, color: const Color(0xFFF5F5F5)),
-                    
-                    // Terms & conditions tab
+                    Container(
+                      width: 1.5,
+                      height: 32,
+                      color: const Color(0xFFF5F5F5),
+                    ),
                     _buildFooterButton(
                       icon: Icons.description_outlined,
                       label: "SYARAT & KETENTUAN",
@@ -335,8 +412,6 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
       ),
     );
   }
-
-  // ================= HELPER UI REUSABLE BUILDERS =================
 
   Widget _buildInputLabel(String text) {
     return Text(
@@ -369,10 +444,14 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
         ),
       ),
       child: Row(
-        crossAxisAlignment: alignment == Alignment.topLeft ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment: alignment == Alignment.topLeft
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: alignment == Alignment.topLeft ? const EdgeInsets.only(top: 2) : EdgeInsets.zero,
+            padding: alignment == Alignment.topLeft
+                ? const EdgeInsets.only(top: 2)
+                : EdgeInsets.zero,
             child: Icon(icon, color: const Color(0xFFA3A3A3), size: 20),
           ),
           const SizedBox(width: 12),
@@ -385,8 +464,12 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
   InputDecoration _buildInputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      counterText: "", // Menghilangkan teks counter bawaan maxLength Flutter
-      hintStyle: const TextStyle(color: Color(0xFFA3A3A3), fontSize: 14, fontWeight: FontWeight.w500),
+      counterText: "",
+      hintStyle: const TextStyle(
+        color: Color(0xFFA3A3A3),
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
       border: InputBorder.none,
       enabledBorder: InputBorder.none,
       focusedBorder: InputBorder.none,
@@ -399,7 +482,11 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
       padding: const EdgeInsets.only(top: 4, left: 4),
       child: Text(
         message,
-        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.red),
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: Colors.red,
+        ),
       ),
     );
   }

@@ -68,7 +68,7 @@ class _KtpScannerScreenState extends State<KtpScannerScreen> {
     );
 
     // Lempar data ke Face Scanner (Selfie)
-    Navigator.pushNamed(context, '/face-scanner', arguments: updatedModel);
+    Navigator.pushNamed(context, '/scan-face', arguments: updatedModel);
   }
 
   @override
