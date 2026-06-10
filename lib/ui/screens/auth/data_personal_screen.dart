@@ -14,10 +14,13 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nikController = TextEditingController();
   final _namaController = TextEditingController();
+  final _emailController =
+      TextEditingController(); // <--- TAMBAHAN CONTROLLER EMAIL
   final _alamatController = TextEditingController();
 
   String? _nikError;
   String? _namaError;
+  String? _emailError; // <--- TAMBAHAN VARIABLE ERROR EMAIL
   String? _alamatError;
 
   late RegistrationDataModel _registrationModel;
@@ -40,12 +43,15 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
     setState(() {
       _nikError = null;
       _namaError = null;
+      _emailError = null; // <--- RESET ERROR EMAIL
       _alamatError = null;
     });
 
     bool isValid = true;
     String nik = _nikController.text.trim();
+    String email = _emailController.text.trim();
 
+    // 1. Validasi Aturan NIK
     if (nik.isEmpty) {
       _nikError = 'NIK wajib diisi';
       isValid = false;
@@ -54,11 +60,22 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
       isValid = false;
     }
 
+    // 2. Validasi Aturan Nama
     if (_namaController.text.trim().isEmpty) {
       _namaError = 'Nama lengkap wajib diisi';
       isValid = false;
     }
 
+    // 3. Validasi Aturan Email (Tambahan)
+    if (email.isEmpty) {
+      _emailError = 'Email wajib diisi';
+      isValid = false;
+    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+      _emailError = 'Format email tidak valid (contoh: user@gmail.com)';
+      isValid = false;
+    }
+
+    // 4. Validasi Aturan Alamat
     if (_alamatController.text.trim().isEmpty) {
       _alamatError = 'Alamat lengkap wajib diisi';
       isValid = false;
@@ -69,7 +86,7 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
       return;
     }
 
-    // 1. Munculkan Dialog Loading Kunci Layar agar aman dari Interupsi ketukan jari user
+    // Munculkan Dialog Loading Kunci Layar
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -80,22 +97,20 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
       ),
     );
 
-    // 2. Isi data personal terakhir ke dalam Koper Data
+    // Kemas seluruh data personal ke dalam Koper Data
     final completeModel = _registrationModel.copyWith(
       nik: _nikController.text.trim(),
       fullName: _namaController.text.trim(),
+      email: email, // <--- EMAIL SEKARANG BERHASIL DIKEMAS DENGAN VALID
       alamat: _alamatController.text.trim(),
     );
 
     try {
-      // 3. Panggil Repositori Fase 1 untuk mengunggah aset gambar & mendaftarkan profile cloud
       final AuthRepository authRepo = AuthRepository();
       await authRepo.registerCompleteUser(completeModel);
 
-      // 4. Tutup loading dialog jika proses sukses mendarat
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
-      // 5. Tampilkan Pesan Sukses KYC Berhasil
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -104,11 +119,9 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
           ),
         );
 
-        // Bersihkan stack dan hantarkan masuk ke Dashboard Utama Home AturAja
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     } catch (e) {
-      // 6. Matikan loading dialog jika tersandung gangguan jaringan internet/aturan rules
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
 
       if (mounted) {
@@ -126,6 +139,7 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
   void dispose() {
     _nikController.dispose();
     _namaController.dispose();
+    _emailController.dispose(); // <--- DISPOSE CONTROLLER EMAIL
     _alamatController.dispose();
     super.dispose();
   }
@@ -252,6 +266,7 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // INPUT FIELD: NIK
                           _buildInputLabel("NIK (NOMOR INDUK KEPENDUDUKAN)"),
                           const SizedBox(height: 8),
                           _buildTextFieldContainer(
@@ -282,6 +297,7 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
 
                           const SizedBox(height: 20),
 
+                          // INPUT FIELD: NAMA LENGKAP
                           _buildInputLabel("NAMA LENGKAP"),
                           const SizedBox(height: 8),
                           _buildTextFieldContainer(
@@ -307,6 +323,37 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
 
                           const SizedBox(height: 20),
 
+                          // ==========================================
+                          // NEW INPUT FIELD: EMAIL (TAMBAHAN SINKRONISASI)
+                          // ==========================================
+                          _buildInputLabel("ALAMAT EMAIL"),
+                          const SizedBox(height: 8),
+                          _buildTextFieldContainer(
+                            icon: Icons.email_outlined,
+                            isError: _emailError != null,
+                            child: TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: _buildInputDecoration(
+                                "contoh: user@gmail.com",
+                              ),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF262626),
+                              ),
+                              onChanged: (val) {
+                                if (_emailError != null)
+                                  setState(() => _emailError = null);
+                              },
+                            ),
+                          ),
+                          if (_emailError != null)
+                            _buildErrorMessage(_emailError!),
+
+                          const SizedBox(height: 20),
+
+                          // INPUT FIELD: ALAMAT LENGKAP
                           _buildInputLabel("ALAMAT LENGKAP"),
                           const SizedBox(height: 8),
                           _buildTextFieldContainer(
@@ -341,6 +388,7 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
 
                           const SizedBox(height: 28),
 
+                          // BUTTON SUBMIT (SELESAI)
                           SizedBox(
                             width: double.infinity,
                             height: 54,
@@ -353,6 +401,9 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 elevation: 4,
+                                shadowColor: const Color(
+                                  0xFFD31111,
+                                ).withOpacity(0.2),
                               ),
                               child: const Text(
                                 "Selesai",
@@ -380,6 +431,13 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.95),
                 border: const Border(top: BorderSide(color: Color(0xFFF5F5F5))),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 20,
+                    offset: const Offset(0, -6),
+                  ),
+                ],
               ),
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
               child: SafeArea(
@@ -412,6 +470,8 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
       ),
     );
   }
+
+  // ================= HELPER UI REUSABLE BUILDERS =================
 
   Widget _buildInputLabel(String text) {
     return Text(

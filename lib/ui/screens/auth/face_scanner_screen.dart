@@ -504,4 +504,3 @@ class _FaceScannerScreenState extends State<FaceScannerScreen> {
     );
   }
 }
-  

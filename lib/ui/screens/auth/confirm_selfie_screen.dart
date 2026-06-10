@@ -263,7 +263,7 @@ class _ConfirmSelfieScreenState extends State<ConfirmSelfieScreen> {
                                     // Bawa koper data lanjut ke form final Data Personal
                                     Navigator.pushReplacementNamed(
                                       context,
-                                      '/scan-face',
+                                      '/data-personal',
                                       arguments: _registrationModel,
                                     );
                                   },
