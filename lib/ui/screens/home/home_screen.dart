@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/home_widgets.dart'; // Import widget kustom kita
+import 'package:aturaja/data/app_state.dart'; // Import AppState untuk pendengar perubahan saldo
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -95,11 +96,32 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Row(
+            Row(
               children: [
-                BalanceCard(label: 'Saldo Utama', amount: 'Rp5,200,000'),
-                SizedBox(width: 12),
-                BalanceCard(label: 'Saldo Makanan', amount: 'Rp80,000'),
+                // ========================================================
+                // PERBAIKAN: Bungkus ValueListenableBuilder dengan Expanded
+                // ========================================================
+                Expanded(
+                  child: ValueListenableBuilder<double>(
+                    valueListenable: AppState.mainBalance,
+                    builder: (context, balance, child) {
+                      return BalanceCard(
+                        label: 'Saldo Utama',
+                        amount: AppState.formatRupiah(balance),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(width: 12),
+
+                // Jangan lupa bungkus BalanceCard kedua dengan Expanded juga
+                const Expanded(
+                  child: BalanceCard(
+                    label: 'Saldo Makanan',
+                    amount: 'Rp80.000',
+                  ),
+                ),
               ],
             ),
           ],
@@ -113,91 +135,96 @@ class HomeScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Transform.translate(
         offset: const Offset(0, -15),
-          // Membuat tombol bisa ditekan
-      // ===========================
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-
+        // Membuat tombol bisa ditekan
         // ===========================
-        // NAVIGATOR PUSH NAMED
-        // Routing ke halaman budgeting
-        // ===========================
-        onTap: () {
-          Navigator.pushNamed(context, '/budgeting');
-        },
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
 
-        child: Container(
-          width: double.infinity,
-          height: 50,
+          // ===========================
+          // NAVIGATOR PUSH NAMED
+          // Routing ke halaman budgeting
+          // ===========================
+          onTap: () {
+            Navigator.pushNamed(context, '/budgeting');
+          },
 
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            height: 50,
 
-            border: Border.all(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withAlpha((0.1 * 255).round()),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+              ),
+
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha((0.05 * 255).round()),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
 
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha((0.05 * 255).round()),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-
-          child: Center(
-            child: Text(
-              'Budgeting',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+            child: Center(
+              child: Text(
+                'Budgeting',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildQuickActions(BuildContext context) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+          ),
+        ),
+        child: Row(
+          // Hilangkan 'const' di sini karena ada fungsi Navigator
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            QuickActionItem(
+              icon: Icons.add_circle_outline,
+              label: 'Top Up',
+              onTap: () {
+                // ===========================
+                // NAVIGATOR PUSH NAMED
+                // Routing ke halaman top-up
+                // ===========================
+                Navigator.pushNamed(context, '/topup');
+              },
+            ),
+            const QuickActionItem(icon: Icons.send_outlined, label: 'Transfer'),
+            const QuickActionItem(
+              icon: Icons.pie_chart_outline,
+              label: 'Rekap',
+            ),
+          ],
         ),
       ),
-      child: Row( // Hilangkan 'const' di sini karena ada fungsi Navigator
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          QuickActionItem(
-            icon: Icons.add_circle_outline,
-            label: 'Top Up',
-            onTap: () {
-              // ===========================
-              // NAVIGATOR PUSH NAMED
-              // Routing ke halaman top-up
-              // ===========================
-              Navigator.pushNamed(context, '/topup');
-            },
-          ),
-          const QuickActionItem(icon: Icons.send_outlined, label: 'Transfer'),
-          const QuickActionItem(icon: Icons.pie_chart_outline, label: 'Rekap'),
-        ],
-      ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildServicesGrid() {
     return Padding(
