@@ -115,12 +115,17 @@ class _DataPersonalScreenState extends State<DataPersonalScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Registrasi Akun KYC Sukses Berhasil!'),
+            content: Text(
+              'Registrasi Akun Sukses! Silakan Masuk (Login).',
+            ), // Pesan disesuaikan
             backgroundColor: Colors.green,
           ),
         );
 
-        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+        // UBAH ARAH NAVIGASI DARI '/home' MENJADI '/login'
+        // pushNamedAndRemoveUntil akan membersihkan seluruh riwayat halaman KYC
+        // sehingga saat user ada di halaman Login, mereka tidak bisa menekan "Back" ke halaman isi data
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
     } catch (e) {
       if (mounted) Navigator.of(context, rootNavigator: true).pop();
