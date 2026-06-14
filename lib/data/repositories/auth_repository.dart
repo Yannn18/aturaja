@@ -55,6 +55,7 @@ class AuthRepository {
       // 3. KEMAS SEMUANYA KE DALAM SATU DOKUMEN FIRESTORE
       final Map<String, dynamic> userProfile = {
         'phone': data.phone,
+        'password': data.password,
         'fullName': data.fullName,
         'email': data.email,
         'nik': data.nik,
