@@ -1,3 +1,4 @@
+import 'package:aturaja/data/app_state.dart';
 import 'package:aturaja/data/models/budget_item_model.dart';
 import 'package:aturaja/data/repositories/budget_repository.dart';
 import 'package:flutter/material.dart';
@@ -124,21 +125,44 @@ class BudgetSuccessScreen extends StatelessWidget {
                           const Center(child: CircularProgressIndicator()),
                     );
 
-                    // 2. Siapkan data object yang akan dikirim ke Firebase
+                    final int amount = int.tryParse(
+                          nominalString.replaceAll(RegExp(r'[^0-9]'), ''),
+                        ) ??
+                        0;
+
+                    if (AppState.mainBalance.value < amount) {
+                      if (context.mounted) {
+                        Navigator.of(context, rootNavigator: true).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Saldo utama tidak cukup untuk membuat budget baru.',
+                            ),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                      return;
+                    }
+
+                    // 2. Potong saldo utama sesuai nominal budget
+                    AppState.mainBalance.value -= amount;
+
+                    // 3. Siapkan data object yang akan dikirim ke Firebase
                     final newBudget = BudgetItemModel(
                       id: DateTime.now().millisecondsSinceEpoch.toString(),
                       title: name,
                       usedBudget: 0,
-                      totalBudget: int.tryParse(nominalString) ?? 0,
+                      totalBudget: amount,
                       category: tujuan,
                     );
 
                     try {
-                      // 3. Eksekusi tembak data ke Firebase cloud
+                      // 4. Eksekusi tembak data ke Firebase cloud
                       final BudgetRepository repo = BudgetRepository();
                       await repo.addBudget(newBudget);
 
-                      // 4. SEBELUM pindah halaman, pastikan loading dialog ditutup duluan!
+                      // 5. SEBELUM pindah halaman, pastikan loading dialog ditutup duluan!
                       if (context.mounted) {
                         Navigator.of(
                           context,
@@ -146,7 +170,7 @@ class BudgetSuccessScreen extends StatelessWidget {
                         ).pop(); // Menutup dialog loading secara spesifik
                       }
 
-                      // 5. Kembalikan user ke halaman dashboard utama (Halaman Pertama)
+                      // 6. Kembalikan user ke halaman dashboard utama (Halaman Pertama)
                       if (context.mounted) {
                         Navigator.of(
                           context,

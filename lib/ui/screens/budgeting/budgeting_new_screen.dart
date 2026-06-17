@@ -1,4 +1,5 @@
 import 'package:aturaja/core/theme/app_theme.dart';
+import 'package:aturaja/data/app_state.dart';
 import 'package:flutter/material.dart';
 import 'pin_verification_screen.dart';
 
@@ -276,7 +277,15 @@ class _BudgetingNewScreenState extends State<BudgetingNewScreen> {
 
                       const SizedBox(height: 6),
 
-                      Text('Rp5,200,000', style: textTheme.headlineSmall),
+                      ValueListenableBuilder<double>(
+                        valueListenable: AppState.mainBalance,
+                        builder: (context, balance, child) {
+                          return Text(
+                            AppState.formatRupiah(balance),
+                            style: textTheme.headlineSmall,
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ),
