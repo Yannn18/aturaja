@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -64,6 +65,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (savedPassword == inputPassword) {
           // A. Skenario Sukses: Password Cocok
           if (mounted) {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('user_phone', inputPhone);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
