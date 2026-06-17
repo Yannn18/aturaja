@@ -20,8 +20,13 @@ AturAja menggunakan Model Bisnis Monetisasi berupa biaya transaksi dan layanan, 
 Jenis Firebase yang digunakan: Cloud Firestore
 
 Struktur koleksi atau node Firebase: json
+Collection : 
+-budget : id, title, usedBudget, totalBudget, category
+-history : id, description, amount, createdAt, type
+-users : phone, password, fullName, email, nik, alamat, ktpImageUrl, selfieImageUrl, createdAt, updatedAt, kycStatus, isEmailVerified, isPhoneVerified
+-top-up history : description, amount, type, created_at
 
-Jumlah data yang digunakan
+Jumlah data yang digunakan sebanyak 89 data (document) dengan collection sebagai berikut : 
 -budget
 -history
 -users
