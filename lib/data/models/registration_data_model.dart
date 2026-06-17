@@ -44,6 +44,7 @@ class RegistrationDataModel {
   Map<String, dynamic> toJson() {
     return {
       'phone': phone,
+      'password': password,
       'fullName': fullName,
       'email': email,
       'nik': nik,

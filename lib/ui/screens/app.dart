@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../core/constants/colors.dart';
 import 'home/home_screen.dart';
 import 'history/history_screen.dart';
-import 'notification/notification_screen.dart'; // Import halaman notifikasi baru
+import 'notification/notification_screen.dart';
+import 'profile_screen.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -14,25 +15,23 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   int _selectedIndex = 0;
 
-  // 1. List untuk menampung riwayat teks notifikasi
+  // List untuk menampung riwayat teks notifikasi
   List<String> _notifications = [];
 
-  // 2. Status untuk titik merah (belum dibaca)
+  // Status untuk titik merah (belum dibaca)
   bool _hasUnreadNotification = false;
 
-  // 3. Fungsi memicu notifikasi
+  // Fungsi memicu notifikasi
   void triggerNotification(String pesan) {
     setState(() {
-      _notifications.insert(0, pesan); // Teks dinamis masuk ke sini
-      _hasUnreadNotification = true; // Nyalakan titik merah
+      _notifications.insert(0, pesan);
+      _hasUnreadNotification = true;
     });
   }
 
-  // 4. Daftar halaman utama aplikasi
+  // Daftar halaman utama aplikasi
   List<Widget> get _pages => [
-    // Mengirim fungsi triggerNotification ke HomeScreen
     HomeScreen(onBalanceUpdated: triggerNotification),
-
     HistoryScreen(
       onBack: () {
         setState(() {
@@ -40,19 +39,16 @@ class _AppState extends State<App> {
         });
       },
     ),
-
-    // Notification Screen dimasukkan di sini
     NotificationScreen(
       notifications: _notifications,
       onClear: () {
         setState(() {
-          _notifications.clear(); // Hapus semua notifikasi dari daftar
-          _hasUnreadNotification = false; // Matikan titik merah
+          _notifications.clear();
+          _hasUnreadNotification = false;
         });
       },
     ),
-
-    const Center(child: Text("Profile Page", style: TextStyle(fontSize: 24))),
+    const SizedBox(), // Placeholder kosong karena profil dipanggil via rute baru
   ];
 
   @override
@@ -83,9 +79,7 @@ class _AppState extends State<App> {
           ],
         ),
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
       bottomNavigationBar: BottomAppBar(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         height: 65,
@@ -98,15 +92,12 @@ class _AppState extends State<App> {
             _buildNavItem(Icons.home_rounded, "Home", 0),
             _buildNavItem(Icons.history_rounded, "History", 1),
             const SizedBox(width: 40),
-
-            // Integrasi Notifikasi di sini:
             _buildNavItem(
-                Icons.mail_outline_rounded,
-                "Notifications",
-                2,
-                isNotif: _hasUnreadNotification // Menggunakan variabel status baca
+              Icons.mail_outline_rounded,
+              "Notifications",
+              2,
+              isNotif: _hasUnreadNotification,
             ),
-
             _buildNavItem(Icons.person_outline_rounded, "Profile", 3),
           ],
         ),
@@ -115,15 +106,26 @@ class _AppState extends State<App> {
   }
 
   Widget _buildNavItem(IconData icon, String label, int index, {bool isNotif = false}) {
-    bool isActive = _selectedIndex == index;
+    // Profil tidak menggunakan index state, jadi kita atur isActive-nya false saat di menu lain
+    bool isActive = _selectedIndex == index && index != 3;
 
     return InkWell(
       onTap: () {
+        // JIKA YANG DIKLIK ADALAH PROFIL (INDEX 3)
+        if (index == 3) {
+          // Tembak langsung ke halaman ProfileScreen!
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfileScreen()),
+          );
+          return;
+        }
+
+        // Jika yang diklik menu lain
         setState(() {
           _selectedIndex = index;
-          // Jika user klik menu notifikasi, matikan titik merahnya
           if (index == 2) {
-            _hasUnreadNotification = false;
+            _hasUnreadNotification = false; // Matikan titik merah saat buka notifikasi
           }
         });
       },
@@ -142,7 +144,6 @@ class _AppState extends State<App> {
                   size: 26,
                   color: isActive ? AppColors.brandRed : Colors.grey.shade400,
                 ),
-
                 if (isNotif)
                   Positioned(
                     right: -2,

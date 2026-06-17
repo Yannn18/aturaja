@@ -1,3 +1,4 @@
+import 'package:aturaja/data/app_state.dart';
 import 'package:aturaja/data/models/budget_item_model.dart';
 import 'package:aturaja/data/repositories/budget_repository.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +18,6 @@ class _BudgetingScreenState extends State<BudgetingScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-
-    final totalSaldo = 5200000;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -89,23 +88,28 @@ class _BudgetingScreenState extends State<BudgetingScreen> {
                         ),
                       ),
 
-                      child: Column(
-                        children: [
-                          Text(
-                            'Rp${totalSaldo.toString()}',
-                            style: textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                      child: ValueListenableBuilder<double>(
+                      valueListenable: AppState.mainBalance,
+                      builder: (context, balance, child) {
+                        return Column(
+                          children: [
+                            Text(
+                              AppState.formatRupiah(balance),
+                              style: textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
 
-                          const SizedBox(height: 12),
+                            const SizedBox(height: 12),
 
-                          Text(
-                            'Total saldo utama',
-                            style: textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
+                            Text(
+                              'Total saldo utama',
+                              style: textTheme.bodyMedium,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                     ),
 
                     const SizedBox(height: 24),

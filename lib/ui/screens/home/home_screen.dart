@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../data/app_state.dart';
 import '../../widgets/home_widgets.dart'; // Import widget kustom kita
 import '../topup/top_up_screen.dart'; // Import halaman Top Up
 
@@ -68,27 +69,22 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(16.0),
       child: Container(
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.circular(20),
-        ),
+        decoration: BoxDecoration(color: Theme.of(context).primaryColor, borderRadius: BorderRadius.circular(20)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Hai, Mario',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            const Text('Hai, Mario', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
-            const Row(
+            Row(
               children: [
-                BalanceCard(label: 'Saldo Utama', amount: 'Rp5,200,000'),
-                SizedBox(width: 12),
-                BalanceCard(label: 'Saldo Makanan', amount: 'Rp80,000'),
+                ValueListenableBuilder<double>(
+                  valueListenable: AppState.mainBalance,
+                  builder: (context, balance, child) {
+                    return BalanceCard(label: 'Saldo Utama', amount: AppState.formatRupiah(balance));
+                  },
+                ),
+                const SizedBox(width: 12),
+                const BalanceCard(label: 'Saldo Makanan', amount: 'Rp80,000'),
               ],
             ),
           ],

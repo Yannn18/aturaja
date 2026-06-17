@@ -153,7 +153,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // ==========================================
                 GestureDetector(
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/login');
                   },
                   child: RichText(
                     text: const TextSpan(

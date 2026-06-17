@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../data/app_state.dart';
 
 // --- DATA MODELS (Tetap di atas atau di file terpisah) ---
 class InstructionStep {
@@ -174,34 +175,34 @@ class _TopUpScreenState extends State<TopUpScreen> {
         width: 100,
         decoration: BoxDecoration(
           // PERBAIKAN 1: Jangan isi warna abu-abu penuh di sini
-          color: isSelected ? primaryColor : Colors.white, 
+          color: isSelected ? primaryColor : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             // PERBAIKAN 2: Jika tidak dipilih, border menjadi abu-abu
-            color: isSelected ? Colors.transparent : Colors.grey.shade300, 
+            color: isSelected ? Colors.transparent : Colors.grey.shade300,
             width: 2,
           ),
-          boxShadow: isSelected 
-              ? [BoxShadow(color: primaryColor.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))] 
+          boxShadow: isSelected
+              ? [BoxShadow(color: primaryColor.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))]
               : [],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              method.icon, 
+              method.icon,
               // PERBAIKAN 3: Ikon berubah abu-abu jika tidak dipilih
-              color: isSelected ? Colors.white : Colors.grey.shade400, 
+              color: isSelected ? Colors.white : Colors.grey.shade400,
               size: 28,
             ),
             const SizedBox(height: 8),
             Text(
-              method.name.split(' ').last, 
+              method.name.split(' ').last,
               style: TextStyle(
-                fontWeight: FontWeight.bold, 
-                fontSize: 13, 
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
                 // PERBAIKAN 4: Teks berubah abu-abu jika tidak dipilih
-                color: isSelected ? Colors.white : Colors.grey.shade500, 
+                color: isSelected ? Colors.white : Colors.grey.shade500,
               ),
             ),
           ],
@@ -232,10 +233,13 @@ class _TopUpScreenState extends State<TopUpScreen> {
                   // BUNGKUS ICON COPY PAKAI INKWELL
                   InkWell(
                     onTap: () {
-                      // 1. Teks dinamis dikirim dari sini berdasarkan _selectedMethod.name!
+                      // 1. Update saldo di AppState (tambah 50.000)
+                      AppState.mainBalance.value += 50000;
+
+                      // 2. Kirim notifikasi
                       widget.onTopUpSuccess("Saldo berhasil ditambahkan ke akun AturAja kamu via ${_selectedMethod.name}.");
 
-                      // 2. Munculin pop up berhasil yang juga dinamis
+                      // 3. Feedback
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("Nomor VA disalin! Saldo via ${_selectedMethod.name} berhasil ditambahkan."),
@@ -279,7 +283,7 @@ class _TopUpScreenState extends State<TopUpScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
-                  step.text, 
+                  step.text,
                   style: const TextStyle(color: Colors.black87, height: 1.4, fontWeight: FontWeight.w500)
                 ),
               ),
@@ -305,7 +309,16 @@ class _TopUpScreenState extends State<TopUpScreen> {
         children: [
           const Text('Saldo Saat Ini', style: TextStyle(color: Colors.white70, fontSize: 14)),
           const SizedBox(height: 4),
-          const Text('Rp250.000', style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+          // BUNGKUS DENGAN ValueListenableBuilder AGAR DINAMIS
+          ValueListenableBuilder<double>(
+            valueListenable: AppState.mainBalance,
+            builder: (context, balance, child) {
+              return Text(
+                AppState.formatRupiah(balance),
+                style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900),
+              );
+            },
+          ),
           const SizedBox(height: 20),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -333,7 +346,7 @@ class _TopUpScreenState extends State<TopUpScreen> {
         borderRadius: BorderRadius.circular(24),
       ),
       child: Text(
-        'Bebas Biaya Admin via ${_selectedMethod.name}!', 
+        'Bebas Biaya Admin via ${_selectedMethod.name}!',
         style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)
       ),
     );
