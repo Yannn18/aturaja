@@ -20,6 +20,7 @@ import 'ui/screens/auth/confirm_ktp_screen.dart';
 import 'ui/screens/auth/face_scanner_screen.dart';
 import 'ui/screens/auth/confirm_selfie_screen.dart';
 import 'ui/screens/auth/data_personal_screen.dart';
+import 'ui/screens/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,6 +70,7 @@ class MyApp extends StatelessWidget {
         '/budgeting': (context) => const BudgetingScreen(),
         '/budgeting-new': (context) => const BudgetingNewScreen(),
         '/topup': (context) => const TopUpScreen(),
+        '/profile': (context) => const ProfileScreen(), 
 
         // =========================================================
         // ALUR KYC (KNOW YOUR CUSTOMER) REGISTRATION

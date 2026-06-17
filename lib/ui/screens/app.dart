@@ -91,7 +91,14 @@ class _AppState extends State<App> {
     bool isActive = _selectedIndex == index;
 
     return InkWell(
-      onTap: () => setState(() => _selectedIndex = index),
+      onTap: () {
+        if (index == 3) {
+          Navigator.pushNamed(context, '/profile');
+          return;
+        }
+
+        setState(() => _selectedIndex = index);
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
