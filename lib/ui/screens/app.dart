@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/colors.dart'; // Import konstanta warna
+import '../../core/constants/colors.dart';
 import 'home/home_screen.dart';
 import 'history/history_screen.dart';
-
+import 'notification/notification_screen.dart'; // Import halaman notifikasi baru
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -14,28 +14,53 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   int _selectedIndex = 0;
 
-  // Daftar halaman utama aplikasi
+  // 1. List untuk menampung riwayat teks notifikasi
+  List<String> _notifications = [];
+
+  // 2. Status untuk titik merah (belum dibaca)
+  bool _hasUnreadNotification = false;
+
+  // 3. Fungsi memicu notifikasi
+  void triggerNotification(String pesan) {
+    setState(() {
+      _notifications.insert(0, pesan); // Teks dinamis masuk ke sini
+      _hasUnreadNotification = true; // Nyalakan titik merah
+    });
+  }
+
+  // 4. Daftar halaman utama aplikasi
   List<Widget> get _pages => [
-        const HomeScreen(),
-        HistoryScreen(
-          onBack: () {
-            setState(() {
-              _selectedIndex = 0;
-            });
-          },
-        ),
-        const Center(child: Text("Message Page", style: TextStyle(fontSize: 24))),
-        const Center(child: Text("Profile Page", style: TextStyle(fontSize: 24))),
-      ];
+    // Mengirim fungsi triggerNotification ke HomeScreen
+    HomeScreen(onBalanceUpdated: triggerNotification),
+
+    HistoryScreen(
+      onBack: () {
+        setState(() {
+          _selectedIndex = 0;
+        });
+      },
+    ),
+
+    // Notification Screen dimasukkan di sini
+    NotificationScreen(
+      notifications: _notifications,
+      onClear: () {
+        setState(() {
+          _notifications.clear(); // Hapus semua notifikasi dari daftar
+          _hasUnreadNotification = false; // Matikan titik merah
+        });
+      },
+    ),
+
+    const Center(child: Text("Profile Page", style: TextStyle(fontSize: 24))),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // IndexedStack menjaga State (seperti posisi scroll) di tiap halaman
       body: IndexedStack(index: _selectedIndex, children: _pages),
 
-      // Tombol QRIS di tengah (Floating)
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         elevation: 4,
@@ -59,26 +84,29 @@ class _AppState extends State<App> {
         ),
       ),
 
-      // Menentukan posisi FAB agar "masuk" ke dalam BottomAppBar
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      // Navigation Bar dengan Notch (Lengkungan)
       bottomNavigationBar: BottomAppBar(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         height: 65,
         color: Colors.white,
-        shape: const CircularNotchedRectangle(), // Membuat lengkungan untuk FAB
-        notchMargin: 8, // Jarak antara FAB dan lengkungan
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(Icons.home_rounded, "Home", 0),
             _buildNavItem(Icons.history_rounded, "History", 1),
-            const SizedBox(width: 40), // Ruang kosong untuk ditempati FAB QRIS
-            
-            // CONTOH: Menambahkan notifikasi pada menu Message
-            _buildNavItem(Icons.mail_outline_rounded, "Message", 2, isNotif: true), 
-            
+            const SizedBox(width: 40),
+
+            // Integrasi Notifikasi di sini:
+            _buildNavItem(
+                Icons.mail_outline_rounded,
+                "Notifications",
+                2,
+                isNotif: _hasUnreadNotification // Menggunakan variabel status baca
+            ),
+
             _buildNavItem(Icons.person_outline_rounded, "Profile", 3),
           ],
         ),
@@ -86,12 +114,19 @@ class _AppState extends State<App> {
     );
   }
 
-  // Helper widget dengan tambahan parameter isNotif
   Widget _buildNavItem(IconData icon, String label, int index, {bool isNotif = false}) {
     bool isActive = _selectedIndex == index;
 
     return InkWell(
-      onTap: () => setState(() => _selectedIndex = index),
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+          // Jika user klik menu notifikasi, matikan titik merahnya
+          if (index == 2) {
+            _hasUnreadNotification = false;
+          }
+        });
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -99,7 +134,6 @@ class _AppState extends State<App> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Menerapkan Stack untuk menumpuk Icon dan Badge Notifikasi
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -108,8 +142,7 @@ class _AppState extends State<App> {
                   size: 26,
                   color: isActive ? AppColors.brandRed : Colors.grey.shade400,
                 ),
-                
-                // Logika IF untuk menampilkan titik merah notifikasi
+
                 if (isNotif)
                   Positioned(
                     right: -2,
@@ -118,9 +151,9 @@ class _AppState extends State<App> {
                       width: 10,
                       height: 10,
                       decoration: BoxDecoration(
-                        color: Colors.red, // Warna titik notifikasi
+                        color: Colors.red,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5), // Garis tepi putih agar rapi
+                        border: Border.all(color: Colors.white, width: 1.5),
                       ),
                     ),
                   ),

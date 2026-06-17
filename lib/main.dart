@@ -68,7 +68,7 @@ class MyApp extends StatelessWidget {
         '/history': (context) => const HistoryScreen(),
         '/budgeting': (context) => const BudgetingScreen(),
         '/budgeting-new': (context) => const BudgetingNewScreen(),
-        '/topup': (context) => const TopUpScreen(),
+       // '/topup': (context) => const TopUpScreen(),
 
         // =========================================================
         // ALUR KYC (KNOW YOUR CUSTOMER) REGISTRATION

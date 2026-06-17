@@ -18,7 +18,8 @@ class PaymentMethod {
 }
 
 class TopUpScreen extends StatefulWidget {
-  const TopUpScreen({super.key});
+  final Function(String) onTopUpSuccess; // Ubah VoidCallback jadi Function(String)
+  const TopUpScreen({super.key, required this.onTopUpSuccess});
 
   @override
   State<TopUpScreen> createState() => _TopUpScreenState();
@@ -228,7 +229,22 @@ class _TopUpScreenState extends State<TopUpScreen> {
                   const Text('VA: ', style: TextStyle(color: Colors.grey, fontSize: 13)),
                   Text(_selectedMethod.va, style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 13)),
                   const Spacer(),
-                  Icon(Icons.copy, size: 18, color: primaryColor),
+                  // BUNGKUS ICON COPY PAKAI INKWELL
+                  InkWell(
+                    onTap: () {
+                      // 1. Teks dinamis dikirim dari sini berdasarkan _selectedMethod.name!
+                      widget.onTopUpSuccess("Saldo berhasil ditambahkan ke akun AturAja kamu via ${_selectedMethod.name}.");
+
+                      // 2. Munculin pop up berhasil yang juga dinamis
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Nomor VA disalin! Saldo via ${_selectedMethod.name} berhasil ditambahkan."),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                    child: Icon(Icons.copy, size: 18, color: primaryColor),
+                  ),
                 ],
               ),
             ],

@@ -1,34 +1,29 @@
 import 'package:flutter/material.dart';
 import '../../widgets/home_widgets.dart'; // Import widget kustom kita
+import '../topup/top_up_screen.dart'; // Import halaman Top Up
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatefulWidget {
+  final Function(String) onBalanceUpdated; // Ubah VoidCallback jadi Function(String)
+  const HomeScreen({super.key, required this.onBalanceUpdated});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Tambahkan Scaffold agar layout aman
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
-            // 1. Header Section
             _buildHeader(context),
-
-            // 2. Saldo Section
             _buildBalanceSection(context),
-
-            // 3. Budgeting Button
             _buildBudgetingButton(context),
-
-            // 4. Quick Actions
-            _buildQuickActions(context),
-
+            _buildQuickActions(context), // Ini yang tadi dibilang error (karena fungsinya sempat hilang)
             const SizedBox(height: 0),
-
-            // 5. Services Grid
             _buildServicesGrid(),
-
             const SizedBox(height: 100),
           ],
         ),
@@ -36,15 +31,9 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Pisahkan tiap bagian ke dalam Method agar build() tidak terlalu panjang
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        16,
-        40,
-        16,
-        0,
-      ), // Atur top padding untuk status bar
+      padding: const EdgeInsets.fromLTRB(16, 40, 16, 0),
       child: Row(
         children: [
           Container(
@@ -113,91 +102,82 @@ class HomeScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Transform.translate(
         offset: const Offset(0, -15),
-          // Membuat tombol bisa ditekan
-      // ===========================
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-
-        // ===========================
-        // NAVIGATOR PUSH NAMED
-        // Routing ke halaman budgeting
-        // ===========================
-        onTap: () {
-          Navigator.pushNamed(context, '/budgeting');
-        },
-
-        child: Container(
-          width: double.infinity,
-          height: 50,
-
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-
-            border: Border.all(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withAlpha((0.1 * 255).round()),
-            ),
-
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha((0.05 * 255).round()),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () {
+            Navigator.pushNamed(context, '/budgeting');
+          },
+          child: Container(
+            width: double.infinity,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withAlpha((0.1 * 255).round()),
               ),
-            ],
-          ),
-
-          child: Center(
-            child: Text(
-              'Budgeting',
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha((0.05 * 255).round()),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                'Budgeting',
+                style: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
+  // INI FUNGSI YANG TADI HILANG
   Widget _buildQuickActions(BuildContext context) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            QuickActionItem(
+              icon: Icons.add_circle_outline,
+              label: 'Top Up',
+              onTap: () {
+                // Navigasi ke TopUpScreen dan kirim fungsi notifikasinya
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TopUpScreen(onTopUpSuccess: widget.onBalanceUpdated),
+                  ),
+                );
+              },
+            ),
+            const QuickActionItem(icon: Icons.send_outlined, label: 'Transfer'),
+            const QuickActionItem(icon: Icons.pie_chart_outline, label: 'Rekap'),
+          ],
         ),
       ),
-      child: Row( // Hilangkan 'const' di sini karena ada fungsi Navigator
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          QuickActionItem(
-            icon: Icons.add_circle_outline,
-            label: 'Top Up',
-            onTap: () {
-              // ===========================
-              // NAVIGATOR PUSH NAMED
-              // Routing ke halaman top-up
-              // ===========================
-              Navigator.pushNamed(context, '/topup');
-            },
-          ),
-          const QuickActionItem(icon: Icons.send_outlined, label: 'Transfer'),
-          const QuickActionItem(icon: Icons.pie_chart_outline, label: 'Rekap'),
-        ],
-      ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildServicesGrid() {
     return Padding(
@@ -210,44 +190,14 @@ class HomeScreen extends StatelessWidget {
         mainAxisSpacing: 4,
         crossAxisSpacing: 4,
         children: const [
-          ServiceItem(
-            icon: Icons.language,
-            label: 'Pulsa data',
-            color: Colors.red,
-          ),
+          ServiceItem(icon: Icons.language, label: 'Pulsa data', color: Colors.red),
           ServiceItem(icon: Icons.bolt, label: 'Listrik', color: Colors.orange),
-          ServiceItem(
-            icon: Icons.credit_card,
-            label: 'Kartu Uang',
-            color: Colors.red,
-          ),
-          ServiceItem(
-            icon: Icons.money,
-            label: 'Pinjaman',
-            color: Colors.orange,
-            isPromo: true,
-          ),
-          ServiceItem(
-            icon: Icons.nightlight_round,
-            label: 'Infaq',
-            color: Colors.blue,
-          ),
-          ServiceItem(
-            icon: Icons.description,
-            label: 'LinkAja Deals',
-            color: Colors.blue,
-            isPromo: true,
-          ),
-          ServiceItem(
-            icon: Icons.directions_car,
-            label: 'Parkir',
-            color: Colors.blue,
-          ),
-          ServiceItem(
-            icon: Icons.airplanemode_active,
-            label: 'Pesawat',
-            color: Colors.blue,
-          ),
+          ServiceItem(icon: Icons.credit_card, label: 'Kartu Uang', color: Colors.red),
+          ServiceItem(icon: Icons.money, label: 'Pinjaman', color: Colors.orange, isPromo: true),
+          ServiceItem(icon: Icons.nightlight_round, label: 'Infaq', color: Colors.blue),
+          ServiceItem(icon: Icons.description, label: 'LinkAja Deals', color: Colors.blue, isPromo: true),
+          ServiceItem(icon: Icons.directions_car, label: 'Parkir', color: Colors.blue),
+          ServiceItem(icon: Icons.airplanemode_active, label: 'Pesawat', color: Colors.blue),
         ],
       ),
     );
