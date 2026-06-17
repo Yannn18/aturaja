@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../data/app_state.dart';
+import 'package:aturaja/data/app_state.dart';
+import 'package:flutter/services.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // --- DATA MODELS (Tetap di atas atau di file terpisah) ---
 class InstructionStep {
@@ -230,24 +232,82 @@ class _TopUpScreenState extends State<TopUpScreen> {
                   const Text('VA: ', style: TextStyle(color: Colors.grey, fontSize: 13)),
                   Text(_selectedMethod.va, style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 13)),
                   const Spacer(),
+
                   // BUNGKUS ICON COPY PAKAI INKWELL
                   InkWell(
-                    onTap: () {
-                      // 1. Update saldo di AppState (tambah 50.000)
+                    onTap: () async {
+                      Clipboard.setData(
+                        ClipboardData(text: _selectedMethod.va),
+                      );
+
+                      // tambah saldo
                       AppState.mainBalance.value += 50000;
 
-                      // 2. Kirim notifikasi
-                      widget.onTopUpSuccess("Saldo berhasil ditambahkan ke akun AturAja kamu via ${_selectedMethod.name}.");
+                      // kirim notifikasi ke sistem temanmu
+                      widget.onTopUpSuccess(
+                        "Saldo berhasil ditambahkan ke akun AturAja kamu via ${_selectedMethod.name}.",
+                      );
 
-                      // 3. Feedback
+                      int month;
+
+                      switch (_selectedMethod.id) {
+                        case 'bca':
+                          month = 6; // Juni
+                          break;
+
+                        case 'alfamart':
+                          month = 7; // Juli
+                          break;
+
+                        case 'mandiri':
+                          month = 8; // Agustus
+                          break;
+
+                        case 'indomaret':
+                          month = 9; // September
+                          break;
+
+                        default:
+                          month = DateTime.now().month;
+                      }
+
+                      final now = DateTime.now();
+
+                      final transactionDate = DateTime(
+                        now.year,   // tahun saat ini
+                        month,      // bulan sesuai mitra
+                        now.day,    // tanggal saat diklik
+                        now.hour,   // jam saat diklik
+                        now.minute, // menit saat diklik
+                        now.second, // detik saat diklik
+                      );
+
+                      await FirebaseFirestore.instance
+                          .collection('topup_history')
+                          .add({
+                        'description': 'Top Up via ${_selectedMethod.name}',
+                        'amount': 50000,
+                        'type': 'income',
+                        'created_at': Timestamp.fromDate(transactionDate),
+                      });
+
+                      if (!mounted) return;
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("Nomor VA disalin! Saldo via ${_selectedMethod.name} berhasil ditambahkan."),
+                          content: Text(
+                            "Nomor VA disalin! Saldo via ${_selectedMethod.name} berhasil ditambahkan.",
+                          ),
+                          backgroundColor: Colors.green,
                           duration: const Duration(seconds: 2),
                         ),
                       );
                     },
-                    child: Icon(Icons.copy, size: 18, color: primaryColor),
+                    child: Icon(
+                      Icons.copy,
+                      size: 18,
+                      color: primaryColor,
+                    ),
                   ),
                 ],
               ),

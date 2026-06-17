@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'history_details_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class Transaction {
   final String id;
@@ -8,6 +10,29 @@ class Transaction {
   final String amount;
   final String date;
   final IconData icon;
+  factory Transaction.fromFirestore(
+  String id,
+  Map<String, dynamic> data,
+) {
+  final timestamp =
+      data['created_at'] as Timestamp;
+
+  final date = timestamp.toDate();
+
+  return Transaction(
+    id: id,
+    category: data['description'] ?? '',
+    time: DateFormat(
+      'HH:mm',
+    ).format(date),
+    amount:
+        'Rp ${NumberFormat('#,###', 'id_ID').format(data['amount'] ?? 0)}',
+    date: DateFormat(
+      'd MMM yyyy',
+    ).format(date),
+    icon: Icons.account_balance_wallet,
+  );
+}
 
   Transaction({
     required this.id,
@@ -19,113 +44,6 @@ class Transaction {
   });
 }
 
-final List<Transaction> allTransactions = [
-  // --- Bulan April (Apr) ---
-  Transaction(
-    id: '1',
-    category: 'Makanan',
-    time: '12:30',
-    amount: 'Rp 50.000',
-    date: '8 Apr 2025',
-    icon: Icons.fastfood,
-  ),
-  Transaction(
-    id: '2',
-    category: 'Transportasi',
-    time: '09:15',
-    amount: 'Rp 25.000',
-    date: '8 Apr 2025',
-    icon: Icons.directions_car,
-  ),
-  Transaction(
-    id: '3',
-    category: 'Belanja',
-    time: '16:45',
-    amount: 'Rp 150.000',
-    date: '7 Apr 2025',
-    icon: Icons.shopping_bag,
-  ),
-
-  // --- Bulan Mei (Mei) ---
-  Transaction(
-    id: '4',
-    category: 'Tagihan Internet',
-    time: '10:00',
-    amount: 'Rp 350.000',
-    date: '15 Mei 2025',
-    icon: Icons.wifi,
-  ),
-  Transaction(
-    id: '5',
-    category: 'Listrik',
-    time: '14:20',
-    amount: 'Rp 200.000',
-    date: '2 Mei 2025',
-    icon: Icons.electrical_services,
-  ),
-
-  // --- Bulan Juni (Jun) ---
-  Transaction(
-    id: '6',
-    category: 'Nonton Bioskop',
-    time: '19:30',
-    amount: 'Rp 100.000',
-    date: '20 Jun 2025',
-    icon: Icons.movie,
-  ),
-  Transaction(
-    id: '7',
-    category: 'Makan Malam',
-    time: '20:15',
-    amount: 'Rp 75.000',
-    date: '12 Jun 2025',
-    icon: Icons.restaurant,
-  ),
-  Transaction(
-    id: '8',
-    category: 'Top Up E-Wallet',
-    time: '08:00',
-    amount: 'Rp 50.000',
-    date: '5 Jun 2025',
-    icon: Icons.account_balance_wallet,
-  ),
-
-  // --- Bulan Juli (July) ---
-  Transaction(
-    id: '9',
-    category: 'Beli Pakaian',
-    time: '15:40',
-    amount: 'Rp 250.000',
-    date: '25 July 2025',
-    icon: Icons.checkroom,
-  ),
-  Transaction(
-    id: '10',
-    category: 'Ojek Online',
-    time: '17:10',
-    amount: 'Rp 30.000',
-    date: '10 July 2025',
-    icon: Icons.two_wheeler,
-  ),
-
-  // --- Bulan Agustus (Aug) ---
-  Transaction(
-    id: '11',
-    category: 'Belanja Bulanan',
-    time: '11:00',
-    amount: 'Rp 120.000',
-    date: '18 Aug 2025',
-    icon: Icons.local_grocery_store,
-  ),
-  Transaction(
-    id: '12',
-    category: 'Apotek',
-    time: '09:30',
-    amount: 'Rp 80.000',
-    date: '3 Aug 2025',
-    icon: Icons.medical_services,
-  ),
-];
 
 class HistoryScreen extends StatefulWidget {
   final VoidCallback? onBack;
@@ -136,22 +54,25 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  final List<String> months = ['Apr', 'Mei', 'Jun', 'July', 'Aug'];
-  String activeMonth = 'Apr';
+    String formatDate(DateTime date) {
+    return DateFormat('d MMM yyyy').format(date);
+  }
+
+  String formatTime(DateTime date) {
+    return DateFormat('HH:mm').format(date);
+  }
+
+  String formatAmount(int amount) {
+    return 'Rp ${NumberFormat('#,###', 'id_ID').format(amount)}';
+  }  
+  final List<String> months = ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
+  String activeMonth = 'Jun';
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
-    final currentMonthTransactions = allTransactions
-        .where((tx) => tx.date.contains(activeMonth))
-        .toList();
-
-    final uniqueDates = currentMonthTransactions
-        .map((tx) => tx.date)
-        .toSet()
-        .toList();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -268,41 +189,87 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
                       // Transactions List
                       Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(color: colorScheme.outline),
-                            ),
-                          ),
-                          child: uniqueDates.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    "Tidak ada transaksi",
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('topup_history')
+                              .orderBy('created_at', descending: true)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            if (!snapshot.hasData ||
+                                snapshot.data!.docs.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  "Tidak ada transaksi",
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              );
+                            }
+
+                            final allTransactions = snapshot.data!.docs
+                                .map(
+                                  (doc) => Transaction.fromFirestore(
+                                    doc.id,
+                                    doc.data() as Map<String, dynamic>,
                                   ),
                                 )
-                              : ListView.builder(
-                                  padding: const EdgeInsets.only(
-                                    top: 8,
-                                    bottom: 24,
-                                  ),
-                                  itemCount: uniqueDates.length,
-                                  itemBuilder: (context, index) {
-                                    final date = uniqueDates[index];
-                                    final items = currentMonthTransactions
-                                        .where((t) => t.date == date)
-                                        .toList();
+                                .toList();
 
-                                    return TransactionGroup(
-                                      date: date,
-                                      items: items,
-                                    );
-                                  },
+                            final currentMonthTransactions = allTransactions
+                                .where((tx) => tx.date.contains(activeMonth))
+                                .toList();
+
+                            final uniqueDates = currentMonthTransactions
+                                .map((tx) => tx.date)
+                                .toSet()
+                                .toList();
+
+                            return Container(
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  top: BorderSide(color: colorScheme.outline),
                                 ),
+                              ),
+                              child: uniqueDates.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                        "Tidak ada transaksi",
+                                        style: textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      padding: const EdgeInsets.only(
+                                        top: 8,
+                                        bottom: 24,
+                                      ),
+                                      itemCount: uniqueDates.length,
+                                      itemBuilder: (context, index) {
+                                        final date = uniqueDates[index];
+
+                                        final items = currentMonthTransactions
+                                            .where((t) => t.date == date)
+                                            .toList();
+
+                                        return TransactionGroup(
+                                          date: date,
+                                          items: items,
+                                        );
+                                      },
+                                    ),
+                            );
+                          },
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
