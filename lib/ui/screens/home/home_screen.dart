@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // <--- TAMBAHAN IMPORT
+import 'package:shared_preferences/shared_preferences.dart'; // <--- TAMBAHAN IMPORT
 import '../../../data/app_state.dart';
-import '../../widgets/home_widgets.dart'; // Import widget kustom kita
-import '../topup/top_up_screen.dart'; // Import halaman Top Up
+import '../../widgets/home_widgets.dart';
+import '../topup/top_up_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final Function(String) onBalanceUpdated; // Ubah VoidCallback jadi Function(String)
+  final Function(String) onBalanceUpdated;
   const HomeScreen({super.key, required this.onBalanceUpdated});
 
   @override
@@ -12,6 +14,52 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String _displayName = 'Loading...';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  /// Mengambil data nama lengkap user berdasarkan nomor sesi aktif
+  Future<void> _loadUserData() async {
+    try {
+      // 1. Ambil nomor HP dari local storage (SharedPreferences)
+      final prefs = await SharedPreferences.getInstance();
+      final String? userPhone = prefs.getString('user_phone');
+
+      if (userPhone != null && userPhone.isNotEmpty) {
+        // 2. Tarik dokumen user dari koleksi Firestore
+        final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userPhone)
+            .get();
+
+        if (userDoc.exists && mounted) {
+          final Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+
+          setState(() {
+            // Evaluasi fallback key nama yang tersedia di database
+            _displayName = userData['fullName'] ?? userData['name'] ?? userData['nama'] ?? 'User';
+          });
+          return;
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _displayName = 'Tamu';
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _displayName = 'User';
+        });
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildHeader(context),
             _buildBalanceSection(context),
             _buildBudgetingButton(context),
-            _buildQuickActions(context), // Ini yang tadi dibilang error (karena fungsinya sempat hilang)
+            _buildQuickActions(context),
             const SizedBox(height: 0),
             _buildServicesGrid(),
             const SizedBox(height: 100),
@@ -73,7 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Hai, Mario', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            // === DI SINI SUDAH MENJADI DINAMIS MENGGUNAKAN STATE ===
+            Text(
+                'Hai, $_displayName',
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)
+            ),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -139,7 +191,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // INI FUNGSI YANG TADI HILANG
   Widget _buildQuickActions(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -158,7 +209,6 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.add_circle_outline,
               label: 'Top Up',
               onTap: () {
-                // Navigasi ke TopUpScreen dan kirim fungsi notifikasinya
                 Navigator.push(
                   context,
                   MaterialPageRoute(
